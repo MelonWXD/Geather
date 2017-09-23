@@ -122,7 +122,6 @@ public class HourlyForecastView extends View implements ScrollWatcher {
 
     private void init(Context context) {
         mContext = context;
-
 //        initData();
 //        initDefValue();
     }
@@ -161,20 +160,20 @@ public class HourlyForecastView extends View implements ScrollWatcher {
         itemWidth = Utils.dp2px(mContext, 70);
 
         defWidthPixel = itemWidth * (hourlyWeatherList.size() - 1);
-        defHeightPixel = Utils.dp2px(mContext, 180);
+        defHeightPixel = Utils.dp2px(mContext, 150);
 
         defRadius = 8;
-        lowestTempHeight = Utils.dp2px(mContext, 90);
-        highestTempHeight = Utils.dp2px(mContext, 130);
+        lowestTempHeight = Utils.dp2px(mContext, 100);//长度  非y轴值
+        highestTempHeight = Utils.dp2px(mContext, 140);
         //defPadding
         paddingT = Utils.dp2px(mContext, 30);
         paddingL = Utils.dp2px(mContext, 30);
         paddingR = Utils.dp2px(mContext, 30);
 
-        textSize = Utils.sp2px(mContext, 20);
+        textSize = Utils.sp2px(mContext, 16);
 
 
-        bitmapHeight = 1 / 2f * (defHeightPixel + lowestTempHeight) - 50;//-50给文字留地方
+        bitmapHeight = 1 / 2f * (2*defHeightPixel - lowestTempHeight) - textSize/2;//- 给文字留地方
         bitmapXY = 32;//32dp
 
     }
@@ -408,7 +407,7 @@ public class HourlyForecastView extends View implements ScrollWatcher {
 
             //画虚线
             if (dashLineWidth.contains(i)) {
-                Log.i(TAG, "drawCircle: " + i);
+
                 canvas.drawLine(w, h, w, baseLineHeight, dashPaint);
             }
 
@@ -446,7 +445,7 @@ public class HourlyForecastView extends View implements ScrollWatcher {
 
     public float tempHeightPixel(float tmp) {
         float res = ((tmp - lowestTemp) / (highestTemp - lowestTemp)) * (highestTempHeight - lowestTempHeight) + lowestTempHeight;
-        return Utils.dp2px(mContext, 180) - res;//y从上到下
+        return defHeightPixel - res;//y从上到下
     }
 
     @Override

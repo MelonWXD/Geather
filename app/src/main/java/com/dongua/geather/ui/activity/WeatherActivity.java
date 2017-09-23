@@ -33,6 +33,7 @@ import com.dongua.geather.ui.view.WeatherView;
 import com.dongua.geather.utils.LogUtil;
 import com.dongua.geather.utils.SharedPreferenceUtil;
 import com.dongua.geather.utils.UIUtils;
+import com.dongua.geather.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -255,14 +256,13 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         JsonArray ja = jo.getAsJsonArray("hourly");
 
         for (JsonElement element : ja) {
-            HourlyWeatherBean bean = gson.fromJson(element, new TypeToken<HourlyWeatherBean>() {
-            }.getType());
+            HourlyWeatherBean bean = gson.fromJson(element,HourlyWeatherBean.class);
             hourlyWeatherList.add(bean);
         }
 
 
         hourlyForecastView.setHighestTemp(27);
-        hourlyForecastView.setHighestTemp(16);
+        hourlyForecastView.setLowestTemp(16);
         hourlyForecastView.initData(hourlyWeatherList);
         watched.addWatcher(hourlyForecastView);
 
