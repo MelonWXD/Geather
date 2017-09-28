@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@mipmap/bg_snow"/>
+
+    <item
+        android:drawable="@mipmap/bg_snow_left"
+        android:top="160dp"/>
+
+    <item
+        android:drawable="@mipmap/bg_snow_right"
+        android:top="160dp"/>
+
+
+</layer-list>

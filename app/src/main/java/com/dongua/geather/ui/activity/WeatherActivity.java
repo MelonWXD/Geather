@@ -7,12 +7,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -42,6 +44,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -59,7 +62,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     private WeatherPresenter mPresenter;
     private Context mContext;
 
-    @BindView(R.id.swipe_refresh)
+//    @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.weather_scroll)
@@ -72,6 +75,9 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
     @BindView(R.id.header_area)
     LinearLayout header;
+
+    @BindView(R.id.realtime)
+    RelativeLayout realtimeLayout;
 
     @BindView(R.id.footer_area)
     LinearLayout footer;
@@ -138,7 +144,6 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     private TextView mWindSpdText;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,13 +174,22 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     }
 
     private void initView() {
-
-        initRefreshLayout();
+        initRealtimeLayout();
+//        initRefreshLayout();
         initScrollView();
         initHourlyView(data);
         initRatioBar();
 
 
+    }
+
+    private void initRealtimeLayout() {
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        realtimeLayout.setBackground(getResources().getDrawable(R.drawable.bg_realtime));
+
+//        if (hour <= 6 && hour >= 19){
+//        }
     }
 
     private void initRefreshLayout() {
@@ -212,7 +226,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
                 if (scrollY > footerTop + headerDistance) {
                     header.setVisibility(View.VISIBLE);
                     header.setAlpha(1);
-                    Log.i("wxdtg", "onScrollChange: 显示"+header.getVisibility());
+                    Log.i("wxdtg", "onScrollChange: 显示" + header.getVisibility());
                 } else if (scrollY > footerTop) {
                     header.setVisibility(View.VISIBLE);
                     float alpha = (scrollY - footerTop) / headerDistance;
@@ -256,7 +270,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         JsonArray ja = jo.getAsJsonArray("hourly");
 
         for (JsonElement element : ja) {
-            HourlyWeatherBean bean = gson.fromJson(element,HourlyWeatherBean.class);
+            HourlyWeatherBean bean = gson.fromJson(element, HourlyWeatherBean.class);
             hourlyWeatherList.add(bean);
         }
 

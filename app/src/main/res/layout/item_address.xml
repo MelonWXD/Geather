@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/item_address_img"
         android:paddingLeft="12.5dp"
-        android:src="@drawable/icon_address_arrow_selected"
+        android:src="@mipmap/find_city_action_bar_back"
         android:layout_width="wrap_content"
         android:visibility="invisible"
         android:layout_height="wrap_content" />

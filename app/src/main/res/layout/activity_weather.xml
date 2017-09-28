@@ -6,10 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/weather_scroll"
@@ -36,9 +32,9 @@
 
 
                 <RelativeLayout
+                    android:id="@+id/realtime"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:background="@color/lightblue">
+                    android:layout_height="300dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -77,7 +73,7 @@
                             android:id="@+id/more_options"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            android:background="@drawable/more"
+                            android:background="@mipmap/acitivity_weather_more_btn"
                             android:scaleType="fitCenter" />
 
                     </FrameLayout>
@@ -312,5 +308,4 @@
 
     </LinearLayout>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>
