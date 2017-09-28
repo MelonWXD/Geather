@@ -144,6 +144,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     private TextView mWindSpdText;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
