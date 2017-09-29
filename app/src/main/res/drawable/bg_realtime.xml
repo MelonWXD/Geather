@@ -3,15 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:drawable="@mipmap/bg_snow"/>
+        android:drawable="@mipmap/bg_sunny"/>
 
     <item
-        android:drawable="@mipmap/bg_snow_left"
-        android:top="160dp"/>
+        android:drawable="@mipmap/bg_sunny_left"
+        android:top="300dp"/>
 
     <item
-        android:drawable="@mipmap/bg_snow_right"
-        android:top="160dp"/>
+        android:drawable="@mipmap/bg_sunny_right"
+        android:top="320dp"/>
 
+    <item
+        android:drawable="@mipmap/bg_sunny_tree"
+        android:top="100dp"
+        android:left="200dp"/>
 
 </layer-list>
