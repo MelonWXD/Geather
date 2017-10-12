@@ -9,12 +9,9 @@
 
     <ScrollView
         android:id="@+id/weather_scroll"
-        android:scrollbars="none"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-
+        android:layout_height="match_parent"
+        android:scrollbars="none">
 
 
         <LinearLayout
@@ -125,40 +122,24 @@
                     <include
                         android:id="@+id/forecast_info1"
                         layout="@layout/forecast_area" />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginLeft="50dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/gray" />
+
+                    <include layout="@layout/daily_forecast_divider" />
+
                     <include
                         android:id="@+id/forecast_info2"
                         layout="@layout/forecast_area" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginLeft="50dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/gray" />
+                    <include layout="@layout/daily_forecast_divider" />
 
                     <include
                         android:id="@+id/forecast_info3"
                         layout="@layout/forecast_area" />
 
 
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/gray" />
+                    <include layout="@layout/daily_forecast_divider" />
 
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:gravity="center"
+                        style="@style/CenterTextView"
                         android:text="15天趋势预报" />
 
                 </LinearLayout>
@@ -171,17 +152,17 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:padding="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:padding="10dp"
 
                     android:text="24小时天气预报"
                     android:textSize="20sp" />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@color/gray" />
+                    android:layout_height="2px"
+                    android:background="@color/linen" />
 
                 <HorizontalScrollView
                     android:id="@+id/hourly_forecast_hs"
@@ -212,59 +193,65 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:text="空气质量"
-                        android:textSize="20sp"
-                        android:padding="10dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="空气质量"
+                        android:textSize="20sp" />
 
                     <View
-                        android:layout_width="1px"
+                        android:layout_width="2px"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="6dp"
                         android:layout_marginBottom="3dp"
-                        android:background="@color/gray" />
+                        android:layout_marginTop="6dp"
+                        android:background="@color/linen" />
 
                     <TextView
                         android:id="@+id/aqi_title"
-                        android:text="优"
-                        android:textSize="20sp"
-                        android:padding="10dp"
                         android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:layout_height="wrap_content" />
+                        android:padding="10dp"
+                        android:text="优"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/aqi_publishtime"
-                        android:text="15:00发布"
-                        android:textSize="16sp"
-                        android:padding="5dp"
                         android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content" />
+                        android:textColor="@color/gray"
+                        android:padding="5dp"
+                        android:text="15:00发布"
+                        android:textSize="16sp" />
                 </LinearLayout>
 
+
+                <include layout="@layout/daily_forecast_divider" />
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="60dp">
+                    android:padding="40dp">
 
                     <com.dongua.geather.ui.customview.RoundRatioBar
                         android:id="@+id/aqi_bar"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_alignParentStart="true"/>
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_alignParentStart="true" />
+
                     <com.dongua.geather.ui.customview.RoundRatioBar
                         android:id="@+id/pm25_bar"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_alignParentEnd="true"/>
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_alignParentEnd="true" />
 
 
                 </RelativeLayout>
-
-
+                <include layout="@layout/daily_forecast_divider" />
+                <TextView
+                    style="@style/CenterTextView"
+                    android:text="空气质量详情" />
 
 
             </LinearLayout>
@@ -281,8 +268,8 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
-        android:gravity="center"
         android:background="@color/white"
+        android:gravity="center"
         android:orientation="horizontal"
         android:visibility="invisible">
 

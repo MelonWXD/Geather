@@ -19,30 +19,27 @@ public class App extends Application {
 
     private static DaoSession mDaoSession;
 
-    private static App INSTANCE;
 
-    private static Context mContext;
+    private Context mContext;
 
-    public static App getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new App();
-        }
-        return INSTANCE;
-    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        mContext = getApplicationContext();
+        mContext = this.getApplicationContext();
+        AppManager.getInstance().setContext(mContext);
         setupDatabase(this);
         setupLog4j();
 
+
+
     }
 
-    public static Context getContext() {
-        return mContext;
-    }
+
+
+
 
     private void setupDatabase(Context context) {
         DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(context, DATABASE_WEATHER);

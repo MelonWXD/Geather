@@ -1,6 +1,7 @@
 package com.dongua.geather.ui.presenter;
 
 import com.dongua.geather.App;
+import com.dongua.geather.AppManager;
 import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.ui.base.BasePresenter;
 import com.dongua.geather.ui.listener.OnNetworkListener;
@@ -67,7 +68,7 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
         @Override
         public void run() {
             if(mLocModel.saveLocDB()){
-                SharedPreferenceUtil.putSharedPreferences(App.getContext(),SP_LOCDB,true);
+                SharedPreferenceUtil.putSharedPreferences(AppManager.getInstance().getAppContext(),SP_LOCDB,true);
                 LogUtil.I("loc db save successful");
             }else {
                 LogUtil.I("loc db save fail");

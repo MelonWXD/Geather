@@ -7,7 +7,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,13 +34,11 @@ import com.dongua.geather.ui.view.WeatherView;
 import com.dongua.geather.utils.LogUtil;
 import com.dongua.geather.utils.SharedPreferenceUtil;
 import com.dongua.geather.utils.UIUtils;
-import com.dongua.geather.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -150,10 +147,12 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         super.onCreate(savedInstanceState);
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        AppManager.getAppManager().addActivity(this);
+        AppManager.getInstance().addActivity(this);
         mContext = this;
         setContentView(R.layout.activity_weather);
         ButterKnife.bind(this);
+
+
 
         initPresent();
 
@@ -320,7 +319,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 //    public void onToolBarClick(View view) {
 //        switch (view.getId()) {
 //            case R.id.toolbar_lefticon:
-//                AppManager.getAppManager().finishActivity();
+//                AppManager.getInstance().finishActivity();
 //                break;
 //            case R.id.toolbar_righticon:
 //                showPoupWindow(view);

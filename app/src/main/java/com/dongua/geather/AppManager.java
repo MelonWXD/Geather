@@ -16,13 +16,18 @@ public class AppManager {
     private static Stack<Activity> activityStack;
     private static AppManager instance;
 
+    public Context getAppContext() {
+        return appContext;
+    }
+
+    private Context appContext;
     private AppManager() {
     }
 
     /**
      * 单一实例
      */
-    public static AppManager getAppManager() {
+    public static AppManager getInstance() {
         if (instance == null) {
             instance = new AppManager();
         }
@@ -100,6 +105,10 @@ public class AppManager {
             System.exit(0);
         } catch (Exception e) {
         }
+    }
+
+    public void setContext(Context context) {
+        this.appContext = context;
     }
 }
 

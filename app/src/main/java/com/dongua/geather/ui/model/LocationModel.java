@@ -1,6 +1,7 @@
 package com.dongua.geather.ui.model;
 
 import com.dongua.geather.App;
+import com.dongua.geather.AppManager;
 import com.dongua.geather.bean.state.City;
 import com.dongua.geather.bean.state.Region;
 import com.dongua.geather.bean.state.State;
@@ -33,7 +34,7 @@ public class LocationModel {
     public boolean saveLocDB() {
 
         try {
-            InputStream is = App.getContext().getAssets().open("LocList.xml");
+            InputStream is = AppManager.getInstance().getAppContext().getAssets().open("LocList.xml");
 
             SAXReader reader = new SAXReader();
             Document document = reader.read(is);
@@ -84,7 +85,7 @@ public class LocationModel {
 
         try {
 
-            InputStream is = App.getContext().getAssets().open("LocList.xml");
+            InputStream is = AppManager.getInstance().getAppContext().getAssets().open("LocList.xml");
 
             SAXReader reader = new SAXReader();
             Document document = reader.read(is);
