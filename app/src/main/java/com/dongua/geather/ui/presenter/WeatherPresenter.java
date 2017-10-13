@@ -33,7 +33,7 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
     }
 
     public void showWeatherInfo(){
-        mWeatherModel.getIPJson();
+        mWeatherModel.getWeatherByIp();
 //        mWeatherModel.getWeatherJson(ipOrName);
     }
 
@@ -51,6 +51,7 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
     @Override
     public void successed(Object bean) {
         Weather weather = (Weather)bean;
+        LogUtil.I("获得weather："+weather.toString());
 
     }
 

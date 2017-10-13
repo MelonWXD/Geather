@@ -14,7 +14,7 @@ public class Constant {
     public static final String WEATHER_JSON_URL ="https://api.seniverse.com/v3/weather/daily.json?" +
             "key=ryualdb6d8cgv8zd&location=101010100&language=zh-Hans&unit=c&start=0&days=5";
 
-    public static final String WEATHER_BASE_URL ="http://weixin.jirengu.com/";
+    public static final String WEATHER_BASE_URL ="https://weixin.jirengu.com/";
 
 
     public static final String DATABASE_WEATHER = "weather";

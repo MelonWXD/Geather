@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -49,24 +50,36 @@ public class NetApi {
     }
 
 
+//
+//    public Observable<Weather> getWeatherInfoByRx(String cityID) {
+//        return mWeatherService.getWeatherInfoByRx(cityID);
+//    }
+//
+//
+//    public Call<Weather> getWeatherInfo(String cityID) {
+//        return mWeatherService.getWeatherInfo(cityID);
+//    }
 
-    public Observable<Weather> getWeatherInfoByRx(String cityID) {
-        return mWeatherService.getWeatherInfoByRx(cityID);
+//    public Call<ResponseBody> getCityID(String name) {
+//        return mWeatherService.getCityID(name);
+//    }
+
+//    public Call<ResponseBody> getCityIP() {
+//        return mWeatherService.getCityIP();
+//    }
+
+
+    public Observable<ResponseBody> getCurCityIP(){
+        return mWeatherService.getCurCityIP();
     }
 
 
-    public Call<Weather> getWeatherInfo(String cityID) {
-        return mWeatherService.getWeatherInfo(cityID);
-    }
-
-    public Call<ResponseBody> getCityID(String name) {
-        return mWeatherService.getCityID(name);
-    }
-
-    public Call<ResponseBody> getCityIP() {
-        return mWeatherService.getCityIP();
+    public Observable<ResponseBody> getCityID(String ip){
+        return mWeatherService.getCityID(ip);
     }
 
 
-
+    public Observable<Weather> getCityWeather(String cityID) {
+        return mWeatherService.getCityWeather(cityID);
+    }
 }

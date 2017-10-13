@@ -153,7 +153,6 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         ButterKnife.bind(this);
 
 
-
         initPresent();
 
         initView();
@@ -161,6 +160,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         initDB();
 
 
+        mPresenter.showWeatherInfo();
 //        mPresenter.showWeatherInfo();
     }
 
@@ -299,7 +299,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         footerTop = footer.getTop();
         footerHeight = footer.getHeight();
         headerDistance = Math.abs(footerHeight - headerHeight);
-        LogUtil.I(footerTop + "," + footerHeight + "," + headerHeight);
+//        LogUtil.I(footerTop + "," + footerHeight + "," + headerHeight);
 
         if (hasFocus && Build.VERSION.SDK_INT >= 19) {
             View decorView = getWindow().getDecorView();

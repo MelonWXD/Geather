@@ -14,16 +14,22 @@ import retrofit2.http.Query;
  */
 
 public interface WeatherService {
-    @GET("weather/now")
-    Call<Weather> getWeatherInfo(@Query("cityid") String cityID);
+//    @GET("weather/now")
+//    Call<Weather> getWeatherInfo(@Query("cityid") String cityID);
+//
+//    @GET("weather/now")
+//    Observable<Weather> getWeatherInfoByRx(@Query("cityid") String cityID);
+//
+//    //rxjava
+//    @GET("weather/ip")
+//    Call<ResponseBody> getCityIP();
 
-    @GET("weather/now")
-    Observable<Weather> getWeatherInfoByRx(@Query("cityid") String cityID);
+    @GET("weather/ip")
+    Observable<ResponseBody> getCurCityIP();
 
     @GET("weather/cityid")
-    Call<ResponseBody> getCityID(@Query("location") String cityName);
+    Observable<ResponseBody> getCityID(@Query("location") String ipOrName);
 
-    //rxjava
-    @GET("weather/ip")
-    Call<ResponseBody> getCityIP();
+    @GET("weather/now")
+    Observable<Weather> getCityWeather(@Query("cityid")String cityID);
 }
