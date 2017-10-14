@@ -1,14 +1,14 @@
 package com.dongua.geather.net;
 
+import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.Weather;
-import com.dongua.geather.net.convert.WeatherConverterFactory;
+import com.dongua.geather.net.convert.CustomConverterFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import okhttp3.ResponseBody;
-import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -31,7 +31,7 @@ public class NetApi {
 
         mWeatherService = new Retrofit.Builder()
                 .baseUrl(WEATHER_BASE_URL)
-                .addConverterFactory(WeatherConverterFactory.create())
+                .addConverterFactory(CustomConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
@@ -69,7 +69,7 @@ public class NetApi {
 //    }
 
 
-    public Observable<ResponseBody> getCurCityIP(){
+    public Observable<Response<ResponseBody>> getCurCityIP(){
         return mWeatherService.getCurCityIP();
     }
 
@@ -79,7 +79,12 @@ public class NetApi {
     }
 
 
-    public Observable<Weather> getCityWeather(String cityID) {
+    public Observable<ResponseBody> getCityWeather(String cityID) {
         return mWeatherService.getCityWeather(cityID);
+    }
+
+
+    public Observable<ResponseBody> getCity24H (String cityID){
+        return mWeatherService.getCity24(cityID);
     }
 }

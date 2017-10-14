@@ -28,7 +28,7 @@ public class FutureDao extends AbstractDao<Future, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property City_id = new Property(1, Long.class, "city_id", false, "CITY_ID");
+        public final static Property City_id = new Property(1, String.class, "city_id", false, "CITY_ID");
         public final static Property Date = new Property(2, String.class, "date", false, "DATE");
         public final static Property Day = new Property(3, String.class, "day", false, "DAY");
         public final static Property High = new Property(4, String.class, "high", false, "HIGH");
@@ -52,7 +52,7 @@ public class FutureDao extends AbstractDao<Future, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"FUTURE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"CITY_ID\" INTEGER," + // 1: city_id
+                "\"CITY_ID\" TEXT," + // 1: city_id
                 "\"DATE\" TEXT," + // 2: date
                 "\"DAY\" TEXT," + // 3: day
                 "\"HIGH\" TEXT," + // 4: high
@@ -76,9 +76,9 @@ public class FutureDao extends AbstractDao<Future, Long> {
             stmt.bindLong(1, id);
         }
  
-        Long city_id = entity.getCity_id();
+        String city_id = entity.getCity_id();
         if (city_id != null) {
-            stmt.bindLong(2, city_id);
+            stmt.bindString(2, city_id);
         }
  
         String date = entity.getDate();
@@ -121,9 +121,9 @@ public class FutureDao extends AbstractDao<Future, Long> {
             stmt.bindLong(1, id);
         }
  
-        Long city_id = entity.getCity_id();
+        String city_id = entity.getCity_id();
         if (city_id != null) {
-            stmt.bindLong(2, city_id);
+            stmt.bindString(2, city_id);
         }
  
         String date = entity.getDate();
@@ -166,7 +166,7 @@ public class FutureDao extends AbstractDao<Future, Long> {
     public Future readEntity(Cursor cursor, int offset) {
         Future entity = new Future( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // city_id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // city_id
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // date
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // day
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // high
@@ -180,7 +180,7 @@ public class FutureDao extends AbstractDao<Future, Long> {
     @Override
     public void readEntity(Cursor cursor, Future entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setCity_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setCity_id(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setDate(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setDay(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setHigh(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
@@ -215,7 +215,7 @@ public class FutureDao extends AbstractDao<Future, Long> {
     }
     
     /** Internal query to resolve the "future" to-many relationship of Weather. */
-    public List<Future> _queryWeather_Future(Long city_id) {
+    public List<Future> _queryWeather_Future(String city_id) {
         synchronized (this) {
             if (weather_FutureQuery == null) {
                 QueryBuilder<Future> queryBuilder = queryBuilder();

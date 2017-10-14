@@ -2,10 +2,10 @@ package com.dongua.geather.net.convert;
 
 import com.dongua.geather.App;
 import com.dongua.geather.bean.weather.Future;
+import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Suggestion;
 import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.db.WeatherDao;
-import com.dongua.geather.utils.LogUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -18,7 +18,6 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
-import retrofit2.Response;
 
 import static com.dongua.geather.utils.Utils.logger;
 
@@ -26,17 +25,22 @@ import static com.dongua.geather.utils.Utils.logger;
  * Created by dongua on 17-8-10.
  */
 
-public class WeatherConverter implements Converter<ResponseBody, Weather> {
+public class HourlyWeatherConverter implements Converter<ResponseBody, HourlyWeather> {
 
-    private static WeatherConverter INSTANCE = new WeatherConverter();
+    private static HourlyWeatherConverter INSTANCE = new HourlyWeatherConverter();
 
-    public static WeatherConverter create() {
+    public static HourlyWeatherConverter create() {
         return INSTANCE;
     }
 
     @Override
-    public Weather convert(ResponseBody responseBody) throws IOException {
-            return null;
+    public HourlyWeather convert(ResponseBody responseBody) throws IOException {
+
+
+
+
+
+        return new HourlyWeather("","","","");
     }
 
 

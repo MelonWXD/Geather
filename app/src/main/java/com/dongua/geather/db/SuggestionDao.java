@@ -28,7 +28,7 @@ public class SuggestionDao extends AbstractDao<Suggestion, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property City_id = new Property(1, Long.class, "city_id", false, "CITY_ID");
+        public final static Property City_id = new Property(1, String.class, "city_id", false, "CITY_ID");
         public final static Property Name = new Property(2, String.class, "name", false, "NAME");
         public final static Property Brief = new Property(3, String.class, "brief", false, "BRIEF");
         public final static Property Details = new Property(4, String.class, "details", false, "DETAILS");
@@ -49,7 +49,7 @@ public class SuggestionDao extends AbstractDao<Suggestion, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"SUGGESTION\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"CITY_ID\" INTEGER," + // 1: city_id
+                "\"CITY_ID\" TEXT," + // 1: city_id
                 "\"NAME\" TEXT," + // 2: name
                 "\"BRIEF\" TEXT," + // 3: brief
                 "\"DETAILS\" TEXT);"); // 4: details
@@ -70,9 +70,9 @@ public class SuggestionDao extends AbstractDao<Suggestion, Long> {
             stmt.bindLong(1, id);
         }
  
-        Long city_id = entity.getCity_id();
+        String city_id = entity.getCity_id();
         if (city_id != null) {
-            stmt.bindLong(2, city_id);
+            stmt.bindString(2, city_id);
         }
  
         String name = entity.getName();
@@ -100,9 +100,9 @@ public class SuggestionDao extends AbstractDao<Suggestion, Long> {
             stmt.bindLong(1, id);
         }
  
-        Long city_id = entity.getCity_id();
+        String city_id = entity.getCity_id();
         if (city_id != null) {
-            stmt.bindLong(2, city_id);
+            stmt.bindString(2, city_id);
         }
  
         String name = entity.getName();
@@ -130,7 +130,7 @@ public class SuggestionDao extends AbstractDao<Suggestion, Long> {
     public Suggestion readEntity(Cursor cursor, int offset) {
         Suggestion entity = new Suggestion( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // city_id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // city_id
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // brief
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // details
@@ -141,7 +141,7 @@ public class SuggestionDao extends AbstractDao<Suggestion, Long> {
     @Override
     public void readEntity(Cursor cursor, Suggestion entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setCity_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setCity_id(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setBrief(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setDetails(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
@@ -173,7 +173,7 @@ public class SuggestionDao extends AbstractDao<Suggestion, Long> {
     }
     
     /** Internal query to resolve the "suggestions" to-many relationship of Weather. */
-    public List<Suggestion> _queryWeather_Suggestions(Long city_id) {
+    public List<Suggestion> _queryWeather_Suggestions(String city_id) {
         synchronized (this) {
             if (weather_SuggestionsQuery == null) {
                 QueryBuilder<Suggestion> queryBuilder = queryBuilder();

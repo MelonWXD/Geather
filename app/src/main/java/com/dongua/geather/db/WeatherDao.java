@@ -57,7 +57,7 @@ public class WeatherDao extends AbstractDao<Weather, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"WEATHER\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"CITY_NAME\" TEXT UNIQUE ," + // 1: city_name
-                "\"CITY_ID\" TEXT," + // 2: city_id
+                "\"CITY_ID\" TEXT UNIQUE ," + // 2: city_id
                 "\"UPDATE_DATE\" TEXT," + // 3: update_date
                 "\"DATE\" TEXT," + // 4: date
                 "\"SUNRISE\" TEXT," + // 5: sunrise

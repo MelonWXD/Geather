@@ -26,5 +26,10 @@ public class Constant {
     public static final int DATA_STATE = 0x01;
     public static final int DATA_CITY = 0x02;
     public static final int DATA_REGION = 0x03;
+
+
+
+    public static final int MSG_WEATHER_DATA = 0x01;
+    public static final int MSG_HOURLY_WEATHER_DATA = 0x02;
 }
 

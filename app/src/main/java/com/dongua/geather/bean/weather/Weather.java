@@ -18,6 +18,7 @@ import com.dongua.geather.db.DaoSession;
 import com.dongua.geather.db.SuggestionDao;
 import com.dongua.geather.db.FutureDao;
 import com.dongua.geather.db.WeatherDao;
+import com.dongua.geather.db.HourlyWeatherDao;
 
 
 @Entity
@@ -28,6 +29,7 @@ public class Weather {
     private Long id;
     @Unique
     private String city_name;
+    @Unique
     private String city_id;
     private String update_date;
     private String date;
@@ -43,11 +45,26 @@ public class Weather {
     private String visibility;
     private String pressure;
 
+    @Override
+    public String toString() {
+        return "Weather{" +
+                "city_name='" + city_name + '\'' +
+                ", city_id='" + city_id + '\'' +
+                ", date='" + date + '\'' +
+                ", temperature='" + temperature + '\'' +
+                '}';
+    }
 
+    public void setFuture(List<Future> future) {
+        this.future = future;
+    }
 
+    public void setSuggestions(List<Suggestion> suggestions) {
+        this.suggestions = suggestions;
+    }
 
-
-
+    @ToMany(referencedJoinProperty = "city_id")
+    private List<HourlyWeather> hourlyWeathers;
 
     @ToMany(referencedJoinProperty = "city_id")
     private List<Future> future;
@@ -163,7 +180,33 @@ public class Weather {
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
-    @Generated(hash = 1646080222)
+    @Keep
+    public List<HourlyWeather> getHourlyWeathers() {
+        if (hourlyWeathers == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            HourlyWeatherDao targetDao = daoSession.getHourlyWeatherDao();
+            List<HourlyWeather> hourlyWeathersNew = targetDao._queryWeather_HourlyWeathers(city_id);
+            synchronized (this) {
+                if (hourlyWeathers == null) {
+                    hourlyWeathers = hourlyWeathersNew;
+                }
+            }
+        }
+        return hourlyWeathers;
+    }
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 129288623)
+    public synchronized void resetHourlyWeathers() {
+        hourlyWeathers = null;
+    }
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Keep
     public List<Future> getFuture() {
         if (future == null) {
             final DaoSession daoSession = this.daoSession;
@@ -171,7 +214,7 @@ public class Weather {
                 throw new DaoException("Entity is detached from DAO context");
             }
             FutureDao targetDao = daoSession.getFutureDao();
-            List<Future> futureNew = targetDao._queryWeather_Future(id);
+            List<Future> futureNew = targetDao._queryWeather_Future(city_id);
             synchronized (this) {
                 if (future == null) {
                     future = futureNew;
@@ -189,7 +232,7 @@ public class Weather {
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
-    @Generated(hash = 1533293233)
+    @Keep
     public List<Suggestion> getSuggestions() {
         if (suggestions == null) {
             final DaoSession daoSession = this.daoSession;
@@ -197,8 +240,7 @@ public class Weather {
                 throw new DaoException("Entity is detached from DAO context");
             }
             SuggestionDao targetDao = daoSession.getSuggestionDao();
-            List<Suggestion> suggestionsNew = targetDao
-                    ._queryWeather_Suggestions(id);
+            List<Suggestion> suggestionsNew = targetDao._queryWeather_Suggestions(city_id);
             synchronized (this) {
                 if (suggestions == null) {
                     suggestions = suggestionsNew;
@@ -227,11 +269,10 @@ public class Weather {
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
      * Entity must attached to an entity context.
      */
-    @Keep
     @Generated(hash = 1942392019)
     public void refresh() {
         if (myDao == null) {
-            throw new DaoException("Ehentity is detached from DAO context");
+            throw new DaoException("Entity is detached from DAO context");
         }
         myDao.refresh(this);
     }
@@ -252,6 +293,5 @@ public class Weather {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getWeatherDao() : null;
     }
-
 
 }

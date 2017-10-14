@@ -1,11 +1,13 @@
 package com.dongua.geather.net;
 
 
+import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.Weather;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
@@ -25,11 +27,17 @@ public interface WeatherService {
 //    Call<ResponseBody> getCityIP();
 
     @GET("weather/ip")
-    Observable<ResponseBody> getCurCityIP();
+    Observable<Response<ResponseBody>> getCurCityIP();
 
     @GET("weather/cityid")
     Observable<ResponseBody> getCityID(@Query("location") String ipOrName);
 
     @GET("weather/now")
-    Observable<Weather> getCityWeather(@Query("cityid")String cityID);
+    Observable<ResponseBody> getCityWeather(@Query("cityid")String cityID);
+
+    @GET("weather/future24h")
+    Observable<Future> getCity24H(@Query("cityid")String cityID);
+
+    @GET("weather/future24h")
+    Observable<ResponseBody> getCity24(@Query("cityid")String cityID);
 }

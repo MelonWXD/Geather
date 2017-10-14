@@ -1,6 +1,11 @@
 package com.dongua.geather.ui.model;
 
+import com.dongua.geather.App;
+import com.dongua.geather.bean.weather.Future;
+import com.dongua.geather.bean.weather.HourlyWeather;
+import com.dongua.geather.bean.weather.Suggestion;
 import com.dongua.geather.bean.weather.Weather;
+import com.dongua.geather.db.WeatherDao;
 import com.dongua.geather.net.NetApi;
 import com.dongua.geather.ui.listener.OnNetworkListener;
 import com.dongua.geather.utils.LogUtil;
@@ -10,6 +15,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -21,6 +30,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Headers;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -135,63 +145,165 @@ public class WeatherModel {
 
     }
 
-    String ipAddr = null;
+    //    String ipAddr = null;
     String cityID = null;
-
+//    String updateTime = null;
 
     public void getWeatherByIp() {
         mNetClient.getCurCityIP()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(new Consumer<ResponseBody>() {
-                    @Override
-                    public void accept(ResponseBody responseBody) throws Exception {
-
-                        JsonObject jo = Utils.string2Json(responseBody.string());
-                        ipAddr = jo.get("data").getAsString();
-                        LogUtil.I("ip=" + ipAddr);
-
-                    }
-                })
                 .observeOn(Schedulers.io())
-                .concatMap(new Function<ResponseBody, ObservableSource<ResponseBody>>() {
+                .concatMap(new Function<Response<ResponseBody>, ObservableSource<ResponseBody>>() {
                     @Override
-                    public ObservableSource<ResponseBody> apply(ResponseBody responseBody) throws Exception {
+                    public ObservableSource<ResponseBody> apply(Response<ResponseBody> response) throws Exception {
+
+                        JsonObject jo = Utils.string2Json(response.body().string());
+                        String ipAddr = jo.get("data").getAsString();
                         return mNetClient.getCityID(ipAddr);
                     }
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(new Consumer<ResponseBody>() {
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<ResponseBody>() {
                     @Override
                     public void accept(ResponseBody responseBody) throws Exception {
                         JsonObject jo = new JsonParser().parse(responseBody.string()).getAsJsonObject();
                         JsonArray ja = jo.getAsJsonArray("results");
-                        cityID = ja.get(0).getAsJsonObject().get("id").getAsString();
+                        String cityID = ja.get(0).getAsJsonObject().get("id").getAsString();
                         LogUtil.I("id=" + cityID);
 
-                    }
-                })
-                .observeOn(Schedulers.io())
-                .concatMap(new Function<ResponseBody, ObservableSource<Weather>>() {
-                    @Override
-                    public ObservableSource<Weather> apply(ResponseBody responseBody) throws Exception {
-                        return mNetClient.getCityWeather(cityID);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Weather>() {
-                    @Override
-                    public void accept(Weather weather) throws Exception {
-                        mListener.successed(weather);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        LogUtil.I(throwable.getMessage());
+                        getCityWeatherByID(cityID);
+                        getHourlyByID(cityID);
                     }
                 });
 
 
+    }
+
+    private void getCityWeatherByID(String cityID) {
+        mNetClient.getCityWeather(cityID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Exception {
+                        mListener.successed(parseResponse2Weather(responseBody, cityID));
+                    }
+                });
+    }
+
+
+    //解析response 存数据库并返回
+    private Weather parseResponse2Weather(ResponseBody responseBody, String cityID) {
+        Weather weather = null;
+        try {
+
+            String content = responseBody.string();//string只能调用一次 完了输入流即关闭
+//        LogUtil.I(content);
+            JsonObject jsonObject = new JsonParser().parse(content).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.getAsJsonArray("weather");
+
+            JsonObject weatherJson = jsonArray.get(0).getAsJsonObject();
+            String cityName = weatherJson.get("city_name").getAsString();
+            String cityId = weatherJson.get("city_id").getAsString();
+            String last_update = weatherJson.get("last_update").getAsString();
+
+            JsonObject nowJson = weatherJson.get("now").getAsJsonObject();
+            String now_text = nowJson.get("text").getAsString();
+            String temperature = nowJson.get("temperature").getAsString();
+            String wind_dir = nowJson.get("wind_direction").getAsString();
+            String wind_speed = nowJson.get("wind_speed").getAsString();
+            String visibility = nowJson.get("visibility").getAsString();
+            String pressure = nowJson.get("pressure").getAsString();
+
+
+            JsonObject today = weatherJson.get("today").getAsJsonObject();
+            String sunrise = today.get("sunrise").getAsString();
+            String sunset = today.get("sunset").getAsString();
+
+            //save weather null,cityName,cityId,last_update
+            Date date = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String dateStr = formatter.format(date);
+
+
+            weather = new Weather(null, cityName, cityId, last_update, dateStr, sunrise, sunset,
+                    now_text, temperature, wind_dir, wind_speed, visibility, pressure);
+            App.getDaoSession().getWeatherDao().save(weather);
+
+
+            //存Suggestion
+            List<Suggestion> suggestionList = new ArrayList<>();
+            JsonObject suggest = today.get("suggestion").getAsJsonObject();
+            String[] suggestName = {"dressing", "uv", "car_washing", "travel", "flu", "sport"};
+            for (int i = 0; i < suggestName.length; i++) {
+                String brief = suggest.get(suggestName[i]).getAsJsonObject().get("brief").getAsString();
+                String details = suggest.get(suggestName[i]).getAsJsonObject().get("details").getAsString();
+                Suggestion suggestion = new Suggestion(null, cityId, suggestName[i], brief, details);
+                suggestionList.add(suggestion);
+                App.getDaoSession().getSuggestionDao().save(suggestion);
+            }
+
+            weather.setSuggestions(suggestionList);
+
+            //存Future
+            List<Future> futureList = new ArrayList<>();
+            JsonArray futureJA = weatherJson.get("future").getAsJsonArray();
+            for (int i = 0; i < 3; i++) {
+                String futuredate = futureJA.get(i).getAsJsonObject().get("date").getAsString();
+                String high = futureJA.get(i).getAsJsonObject().get("high").getAsString();
+                String low = futureJA.get(i).getAsJsonObject().get("low").getAsString();
+                String day = futureJA.get(i).getAsJsonObject().get("day").getAsString();
+                String text = futureJA.get(i).getAsJsonObject().get("text").getAsString();
+                String wind = futureJA.get(i).getAsJsonObject().get("wind").getAsString();
+                Future future = new Future(null, cityId, futuredate, day, high, low, text, wind);
+                futureList.add(future);
+                App.getDaoSession().getFutureDao().save(future);
+            }
+
+            weather.setFuture(futureList);
+        } catch (IOException e) {
+            LogUtil.E(e.getMessage());
+        }
+
+
+        return weather;
+    }
+
+    public void getHourlyByID(String cityID) {
+        mNetClient.getCity24H(cityID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Exception {
+                        mListener.successed(parseResponse2Hourly(responseBody, cityID));
+                    }
+                });
+    }
+
+    //解析response 存数据库并返回
+    private List<HourlyWeather> parseResponse2Hourly(ResponseBody responseBody, String cityID) {
+        List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
+        try {
+
+            String content = responseBody.string();//string只能调用一次 完了输入流即关闭
+            JsonObject jsonObject = new JsonParser().parse(content).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.getAsJsonArray("hourly");
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject hourlyJson = jsonArray.get(i).getAsJsonObject();
+                String text = hourlyJson.get("text").getAsString();
+                String code = hourlyJson.get("code").getAsString();
+                String temperature = hourlyJson.get("temperature").getAsString();
+                String time = hourlyJson.get("time").getAsString().substring(11, 16);
+                HourlyWeather hourly = new HourlyWeather(null, cityID, text, code, temperature, time);
+                hourlyWeatherList.add(hourly);
+                App.getDaoSession().getHourlyWeatherDao().save(hourly);
+            }
+
+        } catch (IOException e) {
+
+        }
+        return hourlyWeatherList;
     }
 
 

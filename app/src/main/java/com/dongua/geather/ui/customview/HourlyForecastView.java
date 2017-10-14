@@ -14,7 +14,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.dongua.geather.R;
-import com.dongua.geather.bean.weather.HourlyWeatherBean;
+import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.utils.Utils;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class HourlyForecastView extends View implements ScrollWatcher {
     private int textSize;
 
     //数据
-    private List<HourlyWeatherBean> hourlyWeatherList;
+    private List<HourlyWeather> hourlyWeatherList;
 
     //画虚线的点的index
     private List<Integer> dashLineWidth;
@@ -127,17 +127,17 @@ public class HourlyForecastView extends View implements ScrollWatcher {
     }
 
 
-    public void initData(List<HourlyWeatherBean> weatherData) {
+    public void initData(List<HourlyWeather> weatherData) {
 
         hourlyWeatherList = weatherData;
 
         dashLineWidth = new ArrayList<>();
         Iterator iterator = hourlyWeatherList.iterator();
-        HourlyWeatherBean tmp;
+        HourlyWeather tmp;
         String lastText = "";
         int idx = 0;
         while (iterator.hasNext()) {
-            tmp = (HourlyWeatherBean) iterator.next();
+            tmp = (HourlyWeather) iterator.next();
             if (!tmp.getText().equals(lastText)) {
                 dashLineWidth.add(idx);//从0开始添加虚线位置的索引值idx
                 lastText = tmp.getText();

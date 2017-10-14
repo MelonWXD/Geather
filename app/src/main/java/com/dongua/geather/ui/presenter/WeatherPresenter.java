@@ -2,6 +2,7 @@ package com.dongua.geather.ui.presenter;
 
 import com.dongua.geather.App;
 import com.dongua.geather.AppManager;
+import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.ui.base.BasePresenter;
 import com.dongua.geather.ui.listener.OnNetworkListener;
@@ -11,6 +12,10 @@ import com.dongua.geather.ui.view.WeatherView;
 import com.dongua.geather.utils.LogUtil;
 import com.dongua.geather.utils.SharedPreferenceUtil;
 
+import java.util.List;
+
+import static com.dongua.geather.utils.Constant.MSG_HOURLY_WEATHER_DATA;
+import static com.dongua.geather.utils.Constant.MSG_WEATHER_DATA;
 import static com.dongua.geather.utils.Constant.SP_LOCDB;
 
 /**
@@ -43,15 +48,23 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
         return mWeatherView;
     }
 
+//
+//    @Override
+//    public void successed(Object bean) {
+////        if(bean.getClass()==Weather.class)
+////        Weather weather = (Weather)bean;
+//        LogUtil.I("successed："+bean.toString());
+//        mWeatherView.update(bean);
+//    }
+
     @Override
-    public void successed(String resp) {
-        mWeatherView.setCity_name(resp);
+    public void successed(Weather weather) {
+        mWeatherView.update(weather,MSG_WEATHER_DATA);
     }
 
     @Override
-    public void successed(Object bean) {
-        Weather weather = (Weather)bean;
-        LogUtil.I("获得weather："+weather.toString());
+    public void successed(List<HourlyWeather> hourlyWeathers) {
+        mWeatherView.update(hourlyWeathers,MSG_HOURLY_WEATHER_DATA);
 
     }
 

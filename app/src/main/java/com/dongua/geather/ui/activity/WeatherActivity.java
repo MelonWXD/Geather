@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
@@ -17,12 +19,14 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.dongua.geather.App;
 import com.dongua.geather.AppManager;
 import com.dongua.geather.R;
 import com.dongua.geather.bean.state.City;
 import com.dongua.geather.bean.state.Region;
 import com.dongua.geather.bean.state.State;
-import com.dongua.geather.bean.weather.HourlyWeatherBean;
+import com.dongua.geather.bean.weather.HourlyWeather;
+import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.ui.base.BaseActivity;
 import com.dongua.geather.ui.customview.CommomDialog;
 import com.dongua.geather.ui.customview.HourlyForecastView;
@@ -48,6 +52,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.dongua.geather.R.style.dialog;
+import static com.dongua.geather.utils.Constant.MSG_HOURLY_WEATHER_DATA;
+import static com.dongua.geather.utils.Constant.MSG_WEATHER_DATA;
 import static com.dongua.geather.utils.Constant.SP_LOCDB;
 
 /**
@@ -59,7 +65,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     private WeatherPresenter mPresenter;
     private Context mContext;
 
-//    @BindView(R.id.swipe_refresh)
+    //    @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.weather_scroll)
@@ -81,9 +87,9 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     @BindView(R.id.realtime_wind)
     LinearLayout cur_Wind;
     @BindView(R.id.realtime_humidity)
-    LinearLayout cur_Humidity;
+    LinearLayout cur_Visibility;
     @BindView(R.id.realtime_pollution)
-    LinearLayout cur_Pollution;
+    LinearLayout cur_Pressure;
 
 
     @BindView(R.id.forecast_info1)
@@ -141,6 +147,53 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     private TextView mWindSpdText;
 
 
+    Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case MSG_WEATHER_DATA:
+                    Weather weather = (Weather) msg.obj;
+                    updateView(weather);
+                    break;
+                case MSG_HOURLY_WEATHER_DATA:
+                    List<HourlyWeather> hourlyWeathers = (List<HourlyWeather>) msg.obj;
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    private void updateView(Weather weather) {
+
+        LogUtil.I("updateView:"+weather.toString());
+
+        cur_Temperature.setText(weather.getTemperature());
+        cur_CityName.setText(weather.getCity_name());
+
+        //风向
+        TextView titleWind = (TextView) cur_Wind.findViewById(R.id.title);
+        titleWind.setText(String.format(getResources().getString(R.string.wind), weather.getWind_dir()));
+        TextView descWind = (TextView) cur_Wind.findViewById(R.id.desc);
+
+        int flv = (int)Float.parseFloat(weather.getWind_speed());
+        descWind.setText(String.format(getResources().getString(R.string.level),flv));
+        //可见度
+        TextView titleVisibility = (TextView) cur_Visibility.findViewById(R.id.title);
+        titleVisibility.setText(R.string.text_visibility);
+        TextView descVisibility = (TextView) cur_Visibility.findViewById(R.id.desc);
+        descVisibility.setText(weather.getVisibility());
+        //气压值
+        TextView titlePressure = (TextView) cur_Pressure.findViewById(R.id.title);
+        titlePressure.setText(R.string.text_pressure);
+        TextView descPressure = (TextView) cur_Pressure.findViewById(R.id.desc);
+        descPressure.setText(weather.getPressure());
+
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +213,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         initDB();
 
 
-        mPresenter.showWeatherInfo();
+
 //        mPresenter.showWeatherInfo();
     }
 
@@ -169,6 +222,14 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         if (!(boolean) SharedPreferenceUtil.getSharedPreferences(this, SP_LOCDB, false)) {
             LogUtil.I("SP不存在 生成城市db");
             mPresenter.makeLocDB();
+            mPresenter.showWeatherInfo();//设置当前城市
+        } else {
+            LogUtil.I("SP存在 取出天气数据");
+
+            List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
+            for (Weather w:weatherList){
+                updateView(w);
+            }
 
         }
     }
@@ -264,13 +325,13 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     private void initHourlyView(String jsonData) {
 
 
-        List<HourlyWeatherBean> hourlyWeatherList = new ArrayList<>();
+        List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
         Gson gson = new Gson();
         JsonObject jo = new JsonParser().parse(jsonData).getAsJsonObject();
         JsonArray ja = jo.getAsJsonArray("hourly");
 
         for (JsonElement element : ja) {
-            HourlyWeatherBean bean = gson.fromJson(element, HourlyWeatherBean.class);
+            HourlyWeather bean = gson.fromJson(element, HourlyWeather.class);
             hourlyWeatherList.add(bean);
         }
 
@@ -377,44 +438,11 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
 
     @Override
-    public void setCity_name(String city_name) {
-
-    }
-
-
-    @Override
-    public void setDate(String date) {
-
-    }
-
-    @Override
-    public void setText_dat(String text_dat) {
-
-    }
-
-    @Override
-    public void setText_night(String text_night) {
-
-    }
-
-    @Override
-    public void setHigh(String high) {
-
-    }
-
-    @Override
-    public void setLow(String low) {
-
-    }
-
-    @Override
-    public void setWind_dir(String wind_dir) {
-
-    }
-
-    @Override
-    public void setWind_speed(String wind_speed) {
-
+    public void update(Object bean, int msgType) {
+        Message message = new Message();
+        message.obj = bean;
+        message.what = msgType;
+        mHandler.sendMessage(message);
     }
 
 

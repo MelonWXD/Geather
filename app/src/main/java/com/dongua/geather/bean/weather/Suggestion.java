@@ -12,13 +12,13 @@ import org.greenrobot.greendao.annotation.Id;
 public class Suggestion {
     @Id(autoincrement = true)
     private Long id;
-    private Long city_id;
+    private String city_id;
     private String name;
     private String brief;
     private String details;
-    @Generated(hash = 971078841)
-    public Suggestion(Long id, Long city_id, String name, String brief,
-                      String details) {
+    @Generated(hash = 75665896)
+    public Suggestion(Long id, String city_id, String name, String brief,
+            String details) {
         this.id = id;
         this.city_id = city_id;
         this.name = name;
@@ -34,10 +34,10 @@ public class Suggestion {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getCity_id() {
+    public String getCity_id() {
         return this.city_id;
     }
-    public void setCity_id(Long city_id) {
+    public void setCity_id(String city_id) {
         this.city_id = city_id;
     }
     public String getName() {

@@ -11,7 +11,7 @@ import org.greenrobot.greendao.annotation.Id;
 public class Future {
     @Id(autoincrement = true)
     private Long id;
-    private Long city_id;
+    private String city_id;
 
     //future
     private String date;
@@ -20,9 +20,9 @@ public class Future {
     private String low;
     private String text;
     private String wind;
-    @Generated(hash = 1995060434)
-    public Future(Long id, Long city_id, String date, String day, String high,
-                  String low, String text, String wind) {
+    @Generated(hash = 702584549)
+    public Future(Long id, String city_id, String date, String day, String high,
+            String low, String text, String wind) {
         this.id = id;
         this.city_id = city_id;
         this.date = date;
@@ -41,10 +41,10 @@ public class Future {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getCity_id() {
+    public String getCity_id() {
         return this.city_id;
     }
-    public void setCity_id(Long city_id) {
+    public void setCity_id(String city_id) {
         this.city_id = city_id;
     }
     public String getDate() {

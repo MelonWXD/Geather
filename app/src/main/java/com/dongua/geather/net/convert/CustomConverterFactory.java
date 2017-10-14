@@ -2,6 +2,7 @@ package com.dongua.geather.net.convert;
 
 import android.support.annotation.Nullable;
 
+import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.Weather;
 
 import java.lang.annotation.Annotation;
@@ -16,11 +17,11 @@ import retrofit2.Retrofit;
  * Created by dongua on 17-8-10.
  */
 
-public class WeatherConverterFactory extends Converter.Factory {
+public class CustomConverterFactory extends Converter.Factory {
 
-    private static WeatherConverterFactory INSTANCE = new WeatherConverterFactory();
+    private static CustomConverterFactory INSTANCE = new CustomConverterFactory();
 
-    public static WeatherConverterFactory create() {
+    public static CustomConverterFactory create() {
         return INSTANCE;
     }
 
@@ -30,6 +31,8 @@ public class WeatherConverterFactory extends Converter.Factory {
     public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
         if (type == Weather.class) {
             return WeatherConverter.create();
+        }else if(type == Future.class){
+            return HourlyWeatherConverter.create();
         }
         return null;
     }
