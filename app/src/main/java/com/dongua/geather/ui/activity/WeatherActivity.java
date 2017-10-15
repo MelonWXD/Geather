@@ -13,18 +13,21 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.dongua.geather.App;
 import com.dongua.geather.AppManager;
 import com.dongua.geather.R;
 import com.dongua.geather.bean.state.City;
 import com.dongua.geather.bean.state.Region;
 import com.dongua.geather.bean.state.State;
+import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.ui.base.BaseActivity;
@@ -75,6 +78,8 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     TextView cur_Temperature;
     @BindView(R.id.realtime_cityname)
     TextView cur_CityName;
+    @BindView(R.id.realtime_text)
+    TextView cur_CityText;
 
     @BindView(R.id.header_area)
     LinearLayout header;
@@ -168,18 +173,19 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
     private void updateView(Weather weather) {
 
-        LogUtil.I("updateView:"+weather.toString());
+        LogUtil.I("updateView:" + weather.toString());
 
         cur_Temperature.setText(weather.getTemperature());
         cur_CityName.setText(weather.getCity_name());
+        cur_CityText.setText(weather.getText_now());
 
         //风向
         TextView titleWind = (TextView) cur_Wind.findViewById(R.id.title);
         titleWind.setText(String.format(getResources().getString(R.string.wind), weather.getWind_dir()));
         TextView descWind = (TextView) cur_Wind.findViewById(R.id.desc);
 
-        int flv = (int)Float.parseFloat(weather.getWind_speed());
-        descWind.setText(String.format(getResources().getString(R.string.level),flv));
+        int flv = (int) Float.parseFloat(weather.getWind_speed());
+        descWind.setText(String.format(getResources().getString(R.string.level), flv));
         //可见度
         TextView titleVisibility = (TextView) cur_Visibility.findViewById(R.id.title);
         titleVisibility.setText(R.string.text_visibility);
@@ -190,6 +196,30 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         titlePressure.setText(R.string.text_pressure);
         TextView descPressure = (TextView) cur_Pressure.findViewById(R.id.desc);
         descPressure.setText(weather.getPressure());
+
+
+        List<Future> futureList = weather.getFuture();
+
+        ImageView forecastImg1 = (ImageView) forecast_day1.findViewById(R.id.forecast_icon);
+        TextView forecastDate1 = (TextView) forecast_day1.findViewById(R.id.forecast_date);
+        TextView forecastText1 = (TextView) forecast_day1.findViewById(R.id.forecast_text);
+        TextView forecastTemp1 = (TextView) forecast_day1.findViewById(R.id.forecast_temp);
+        Future day1 = futureList.get(0);
+//        Glide.with(this).load(UIUtils.getImageResID(day1.))  //// TODO: 17-10-15 增加code字段到future
+
+
+
+
+        ImageView forecastImg2 = (ImageView) forecast_day2.findViewById(R.id.forecast_icon);
+        TextView forecastDate2 = (TextView) forecast_day2.findViewById(R.id.forecast_date);
+        TextView forecastText2 = (TextView) forecast_day2.findViewById(R.id.forecast_text);
+        TextView forecastTemp2 = (TextView) forecast_day2.findViewById(R.id.forecast_temp);
+
+        ImageView forecastImg3 = (ImageView) forecast_day3.findViewById(R.id.forecast_icon);
+        TextView forecastDate3 = (TextView) forecast_day3.findViewById(R.id.forecast_date);
+        TextView forecastText3 = (TextView) forecast_day3.findViewById(R.id.forecast_text);
+        TextView forecastTemp3 = (TextView) forecast_day3.findViewById(R.id.forecast_temp);
+
 
 
     }
@@ -213,7 +243,6 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         initDB();
 
 
-
 //        mPresenter.showWeatherInfo();
     }
 
@@ -227,7 +256,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
             LogUtil.I("SP存在 取出天气数据");
 
             List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
-            for (Weather w:weatherList){
+            for (Weather w : weatherList) {
                 updateView(w);
             }
 

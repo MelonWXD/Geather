@@ -146,7 +146,7 @@ public class WeatherModel {
     }
 
     //    String ipAddr = null;
-    String cityID = null;
+//    String cityID = null;
 //    String updateTime = null;
 
     public void getWeatherByIp() {
@@ -175,7 +175,6 @@ public class WeatherModel {
                         getHourlyByID(cityID);
                     }
                 });
-
 
     }
 
