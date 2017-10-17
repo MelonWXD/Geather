@@ -227,7 +227,6 @@ public class WeatherModel {
 
             weather = new Weather(null, cityName, cityId, last_update, dateStr, sunrise, sunset,
                     now_text, temperature, wind_dir, wind_speed, visibility, pressure);
-            App.getDaoSession().getWeatherDao().save(weather);
 
 
             //存Suggestion
@@ -247,19 +246,24 @@ public class WeatherModel {
             //存Future
             List<Future> futureList = new ArrayList<>();
             JsonArray futureJA = weatherJson.get("future").getAsJsonArray();
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < futureJA.size(); i++) {
                 String futuredate = futureJA.get(i).getAsJsonObject().get("date").getAsString();
                 String high = futureJA.get(i).getAsJsonObject().get("high").getAsString();
                 String low = futureJA.get(i).getAsJsonObject().get("low").getAsString();
                 String day = futureJA.get(i).getAsJsonObject().get("day").getAsString();
                 String text = futureJA.get(i).getAsJsonObject().get("text").getAsString();
                 String wind = futureJA.get(i).getAsJsonObject().get("wind").getAsString();
-                Future future = new Future(null, cityId, futuredate, day, high, low, text, wind);
+                String code = futureJA.get(i).getAsJsonObject().get("code1").getAsString();
+                Future future = new Future(null, cityId, futuredate, day, high, low, text, code,wind);
                 futureList.add(future);
                 App.getDaoSession().getFutureDao().save(future);
             }
 
             weather.setFuture(futureList);
+
+
+            App.getDaoSession().getWeatherDao().save(weather);
+
         } catch (IOException e) {
             LogUtil.E(e.getMessage());
         }

@@ -11,8 +11,7 @@
         android:layout_width="0dp"
         android:layout_weight="0.5"
         android:layout_height="31dp"
-        android:scaleType="fitCenter"
-        android:background="@drawable/weather"/>
+        android:scaleType="fitCenter"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -44,7 +43,7 @@
         android:layout_weight="2"
         android:padding="10dp"
         android:gravity="center"
-        android:textSize="30sp"
+        android:textSize="26sp"
         android:text="35 / 25"
         android:layout_height="match_parent" />
 

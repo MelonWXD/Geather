@@ -19,10 +19,11 @@ public class Future {
     private String high;
     private String low;
     private String text;
+    private String code;
     private String wind;
-    @Generated(hash = 702584549)
+    @Generated(hash = 576731812)
     public Future(Long id, String city_id, String date, String day, String high,
-            String low, String text, String wind) {
+            String low, String text, String code, String wind) {
         this.id = id;
         this.city_id = city_id;
         this.date = date;
@@ -30,6 +31,7 @@ public class Future {
         this.high = high;
         this.low = low;
         this.text = text;
+        this.code = code;
         this.wind = wind;
     }
     @Generated(hash = 1483558105)
@@ -82,6 +84,12 @@ public class Future {
     }
     public void setWind(String wind) {
         this.wind = wind;
+    }
+    public String getCode() {
+        return this.code;
+    }
+    public void setCode(String code) {
+        this.code = code;
     }
 
 

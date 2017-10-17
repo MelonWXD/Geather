@@ -149,6 +149,8 @@ public class HourlyForecastView extends View implements ScrollWatcher {
         initDefValue();
         initPaint();
 
+
+
     }
 
 

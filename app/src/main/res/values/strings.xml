@@ -11,4 +11,6 @@
     <string name="text_pressure">气压</string>
     <string name="wind">%1$s风</string>
     <string name="level">%1$d级</string>
+    <string name="forecast_temp">%1$s°/%2$s°</string>
+    <!--<string name="level">%1$d级</string>-->
 </resources>

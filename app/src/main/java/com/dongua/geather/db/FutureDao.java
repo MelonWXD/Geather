@@ -34,7 +34,8 @@ public class FutureDao extends AbstractDao<Future, Long> {
         public final static Property High = new Property(4, String.class, "high", false, "HIGH");
         public final static Property Low = new Property(5, String.class, "low", false, "LOW");
         public final static Property Text = new Property(6, String.class, "text", false, "TEXT");
-        public final static Property Wind = new Property(7, String.class, "wind", false, "WIND");
+        public final static Property Code = new Property(7, String.class, "code", false, "CODE");
+        public final static Property Wind = new Property(8, String.class, "wind", false, "WIND");
     }
 
     private Query<Future> weather_FutureQuery;
@@ -58,7 +59,8 @@ public class FutureDao extends AbstractDao<Future, Long> {
                 "\"HIGH\" TEXT," + // 4: high
                 "\"LOW\" TEXT," + // 5: low
                 "\"TEXT\" TEXT," + // 6: text
-                "\"WIND\" TEXT);"); // 7: wind
+                "\"CODE\" TEXT," + // 7: code
+                "\"WIND\" TEXT);"); // 8: wind
     }
 
     /** Drops the underlying database table. */
@@ -106,9 +108,14 @@ public class FutureDao extends AbstractDao<Future, Long> {
             stmt.bindString(7, text);
         }
  
+        String code = entity.getCode();
+        if (code != null) {
+            stmt.bindString(8, code);
+        }
+ 
         String wind = entity.getWind();
         if (wind != null) {
-            stmt.bindString(8, wind);
+            stmt.bindString(9, wind);
         }
     }
 
@@ -151,9 +158,14 @@ public class FutureDao extends AbstractDao<Future, Long> {
             stmt.bindString(7, text);
         }
  
+        String code = entity.getCode();
+        if (code != null) {
+            stmt.bindString(8, code);
+        }
+ 
         String wind = entity.getWind();
         if (wind != null) {
-            stmt.bindString(8, wind);
+            stmt.bindString(9, wind);
         }
     }
 
@@ -172,7 +184,8 @@ public class FutureDao extends AbstractDao<Future, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // high
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // low
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // text
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // wind
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // code
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // wind
         );
         return entity;
     }
@@ -186,7 +199,8 @@ public class FutureDao extends AbstractDao<Future, Long> {
         entity.setHigh(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setLow(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setText(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setWind(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setCode(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setWind(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
      }
     
     @Override

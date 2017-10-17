@@ -30,6 +30,7 @@ import com.dongua.geather.bean.state.State;
 import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Weather;
+import com.dongua.geather.db.HourlyWeatherDao;
 import com.dongua.geather.ui.base.BaseActivity;
 import com.dongua.geather.ui.customview.CommomDialog;
 import com.dongua.geather.ui.customview.HourlyForecastView;
@@ -143,6 +144,9 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     int footerHeight = 0;
     int footerTop = 0;
 
+    private int tempHigh = 0;
+    private int tempLow = 0;
+
     private TextView mDateText;
     private TextView mDayText;
     private TextView mNigthText;
@@ -163,13 +167,20 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
                     break;
                 case MSG_HOURLY_WEATHER_DATA:
                     List<HourlyWeather> hourlyWeathers = (List<HourlyWeather>) msg.obj;
-
+                    updateView(hourlyWeathers, tempHigh, tempLow);
                     break;
                 default:
                     break;
             }
         }
     };
+
+    private void updateView(List<HourlyWeather> hourlyWeathers, int high, int low) {
+        LogUtil.I("updateView: hourly" + hourlyWeathers.size());
+
+//        hourlyWeathers.forEach(hourlyWeather ->  LogUtil.I("hourly:"+hourlyWeather.toString()));
+        updateHourlyView(hourlyWeathers, high, low);
+    }
 
     private void updateView(Weather weather) {
 
@@ -199,27 +210,44 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
 
         List<Future> futureList = weather.getFuture();
+        if (futureList == null || futureList.size() == 0) {
+            return;
+        }
 
         ImageView forecastImg1 = (ImageView) forecast_day1.findViewById(R.id.forecast_icon);
         TextView forecastDate1 = (TextView) forecast_day1.findViewById(R.id.forecast_date);
         TextView forecastText1 = (TextView) forecast_day1.findViewById(R.id.forecast_text);
         TextView forecastTemp1 = (TextView) forecast_day1.findViewById(R.id.forecast_temp);
         Future day1 = futureList.get(0);
-//        Glide.with(this).load(UIUtils.getImageResID(day1.))  //// TODO: 17-10-15 增加code字段到future
-
-
-
+        Glide.with(this).load(UIUtils.getImageResID(Integer.parseInt(day1.getCode()))).into(forecastImg1);
+        forecastDate1.setText(day1.getDate());
+        forecastText1.setText(day1.getText().replace("/", "转"));
+        forecastTemp1.setText(String.format(getResources().getString(R.string.forecast_temp), day1.getLow(), day1.getHigh()));
+        tempHigh = Integer.parseInt(day1.getHigh());//今日最高温度
+        tempLow = Integer.parseInt(day1.getLow());//今日最低温度
 
         ImageView forecastImg2 = (ImageView) forecast_day2.findViewById(R.id.forecast_icon);
         TextView forecastDate2 = (TextView) forecast_day2.findViewById(R.id.forecast_date);
         TextView forecastText2 = (TextView) forecast_day2.findViewById(R.id.forecast_text);
         TextView forecastTemp2 = (TextView) forecast_day2.findViewById(R.id.forecast_temp);
 
+        Future day2 = futureList.get(1);
+        Glide.with(this).load(UIUtils.getImageResID(Integer.parseInt(day1.getCode()))).into(forecastImg2);
+        forecastDate2.setText(day2.getDate());
+        forecastText2.setText(day2.getText().replace("/", "转"));
+        forecastTemp2.setText(String.format(getResources().getString(R.string.forecast_temp), day2.getLow(), day2.getHigh()));
+
+
         ImageView forecastImg3 = (ImageView) forecast_day3.findViewById(R.id.forecast_icon);
         TextView forecastDate3 = (TextView) forecast_day3.findViewById(R.id.forecast_date);
         TextView forecastText3 = (TextView) forecast_day3.findViewById(R.id.forecast_text);
         TextView forecastTemp3 = (TextView) forecast_day3.findViewById(R.id.forecast_temp);
 
+        Future day3 = futureList.get(2);
+        Glide.with(this).load(UIUtils.getImageResID(Integer.parseInt(day3.getCode()))).into(forecastImg3);
+        forecastDate3.setText(day3.getDate());
+        forecastText3.setText(day3.getText().replace("/", "转"));
+        forecastTemp3.setText(String.format(getResources().getString(R.string.forecast_temp), day3.getLow(), day3.getHigh()));
 
 
     }
@@ -240,26 +268,54 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
         initView();
 
-        initDB();
+        initCityDB();
+
+        initViewData();
 
 
 //        mPresenter.showWeatherInfo();
     }
 
+    private void initViewData() {
+        List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
 
-    private void initDB() {
+        if(weatherList==null || weatherList.size()==0){
+            mPresenter.showWeatherInfo();//设置当前城市
+        }else {
+            // TODO: 17-10-17  add vp to main Acty
+            for (Weather w : weatherList) {
+                intiView(w);
+            }
+        }
+    }
+
+    private void intiView(Weather w) {
+        updateView(w);
+        List<HourlyWeather> hourlyWeathers = App.getDaoSession().getHourlyWeatherDao().queryBuilder()
+                .where(HourlyWeatherDao.Properties.City_id.eq(w.getCity_id()))
+                .list();
+        int max = 0;
+        int min = 99;
+        for(HourlyWeather hourly:hourlyWeathers){
+            int tmp = Integer.parseInt(hourly.getTemperature());
+            if(tmp>max){
+                max = tmp;
+            }
+            if(min>tmp){
+                min = tmp;
+            }
+
+        }
+        updateView(hourlyWeathers,max,min);
+    }
+
+
+    private void initCityDB() {
         if (!(boolean) SharedPreferenceUtil.getSharedPreferences(this, SP_LOCDB, false)) {
             LogUtil.I("SP不存在 生成城市db");
             mPresenter.makeLocDB();
-            mPresenter.showWeatherInfo();//设置当前城市
         } else {
-            LogUtil.I("SP存在 取出天气数据");
-
-            List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
-            for (Weather w : weatherList) {
-                updateView(w);
-            }
-
+            LogUtil.I("SP存在 ");
         }
     }
 
@@ -351,23 +407,8 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     }
 
 
-    private void initHourlyView(String jsonData) {
+    private void initHourlyView(String data) {
 
-
-        List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
-        Gson gson = new Gson();
-        JsonObject jo = new JsonParser().parse(jsonData).getAsJsonObject();
-        JsonArray ja = jo.getAsJsonArray("hourly");
-
-        for (JsonElement element : ja) {
-            HourlyWeather bean = gson.fromJson(element, HourlyWeather.class);
-            hourlyWeatherList.add(bean);
-        }
-
-
-        hourlyForecastView.setHighestTemp(27);
-        hourlyForecastView.setLowestTemp(16);
-        hourlyForecastView.initData(hourlyWeatherList);
         watched.addWatcher(hourlyForecastView);
 
         hourlyScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
@@ -376,6 +417,40 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
                 watched.notifyWatcher(scrollX);
             }
         });
+
+
+        List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
+        Gson gson = new Gson();
+        JsonObject jo = new JsonParser().parse(data).getAsJsonObject();
+        JsonArray ja = jo.getAsJsonArray("hourly");
+
+        for (JsonElement element : ja) {
+            HourlyWeather bean = gson.fromJson(element, HourlyWeather.class);
+            hourlyWeatherList.add(bean);
+        }
+        updateView(hourlyWeatherList, 16, 27);
+    }
+
+    private void updateHourlyView(List<HourlyWeather> hourlyWeatherList, int high, int low) {
+
+//
+//        List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
+//        Gson gson = new Gson();
+//        JsonObject jo = new JsonParser().parse(jsonData).getAsJsonObject();
+//        JsonArray ja = jo.getAsJsonArray("hourly");
+//
+//        for (JsonElement element : ja) {
+//            HourlyWeather bean = gson.fromJson(element, HourlyWeather.class);
+//            hourlyWeatherList.add(bean);
+//        }
+
+
+        hourlyForecastView.setHighestTemp(high);
+        hourlyForecastView.setLowestTemp(low);
+        hourlyForecastView.initData(hourlyWeatherList);
+
+        hourlyForecastView.invalidate();
+
 
     }
 
