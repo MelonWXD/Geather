@@ -1,6 +1,7 @@
 package com.dongua.geather.ui.model;
 
 import com.dongua.geather.App;
+import com.dongua.geather.bean.weather.AirQuality;
 import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Suggestion;
@@ -10,6 +11,7 @@ import com.dongua.geather.net.NetApi;
 import com.dongua.geather.ui.listener.OnNetworkListener;
 import com.dongua.geather.utils.LogUtil;
 import com.dongua.geather.utils.Utils;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -264,6 +266,14 @@ public class WeatherModel {
 
             weather.setFuture(futureList);
 
+            //存AirQuality
+            JsonObject aqiJO = nowJson.get("air_quality").getAsJsonObject().get("city").getAsJsonObject();
+            AirQuality airQuality = new Gson().fromJson(aqiJO,AirQuality.class);
+            airQuality.setLast_update(aqiJO.get("last_update").getAsString().substring(11,16));
+            airQuality.setCity_id(cityID);
+            App.getDaoSession().getAirQualityDao().save(airQuality);
+
+//            weather.setAirQuality(airQuality);
 
             App.getDaoSession().getWeatherDao().save(weather);
 

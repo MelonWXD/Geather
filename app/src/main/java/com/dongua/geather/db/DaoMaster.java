@@ -28,6 +28,7 @@ public class DaoMaster extends AbstractDaoMaster {
         FutureDao.createTable(db, ifNotExists);
         WeatherDao.createTable(db, ifNotExists);
         HourlyWeatherDao.createTable(db, ifNotExists);
+        AirQualityDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -39,6 +40,7 @@ public class DaoMaster extends AbstractDaoMaster {
         FutureDao.dropTable(db, ifExists);
         WeatherDao.dropTable(db, ifExists);
         HourlyWeatherDao.dropTable(db, ifExists);
+        AirQualityDao.dropTable(db, ifExists);
     }
 
     /**
@@ -64,6 +66,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(FutureDao.class);
         registerDaoClass(WeatherDao.class);
         registerDaoClass(HourlyWeatherDao.class);
+        registerDaoClass(AirQualityDao.class);
     }
 
     public DaoSession newSession() {

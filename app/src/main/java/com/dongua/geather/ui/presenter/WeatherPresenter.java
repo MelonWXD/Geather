@@ -77,6 +77,9 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
         new locDBThread().start();
     }
 
+    public void checkUpdate() {
+    }
+
 
     class locDBThread extends Thread {
         @Override

@@ -11,6 +11,7 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Keep;
 import org.greenrobot.greendao.annotation.ToMany;
+import org.greenrobot.greendao.annotation.ToOne;
 import org.greenrobot.greendao.annotation.Unique;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import com.dongua.geather.db.SuggestionDao;
 import com.dongua.geather.db.FutureDao;
 import com.dongua.geather.db.WeatherDao;
 import com.dongua.geather.db.HourlyWeatherDao;
+import com.dongua.geather.db.AirQualityDao;
 
 
 @Entity
@@ -63,6 +65,10 @@ public class Weather {
     public void setSuggestions(List<Suggestion> suggestions) {
         this.suggestions = suggestions;
     }
+
+//
+//    @ToOne(joinProperty = "city_id")
+//    private AirQuality airQuality;
 
     @ToMany(referencedJoinProperty = "city_id")
     private List<HourlyWeather> hourlyWeathers;
@@ -303,5 +309,40 @@ public class Weather {
     public void setCode(String code) {
         this.code = code;
     }
+
+//    /** To-one relationship, resolved on first access. */
+//    @Keep
+//    public AirQuality getAirQuality() {
+//        String __key = this.city_id;
+//        if (airQuality__resolvedKey == null || airQuality__resolvedKey != __key) {
+//            final DaoSession daoSession = this.daoSession;
+//            if (daoSession == null) {
+//                throw new DaoException("Entity is detached from DAO context");
+//            }
+//            AirQualityDao targetDao = daoSession.getAirQualityDao();
+//            AirQuality airQualityNew = targetDao.queryBuilder().where(AirQualityDao.Properties.City_id.eq(__key)).list().get(0);
+//            synchronized (this) {
+//                airQuality = airQualityNew;
+//                airQuality__resolvedKey = __key;
+//            }
+//        }
+//        return airQuality;
+//    }
+//
+//    /** called by internal mechanisms, do not call yourself. */
+//    @Keep
+//    public void setAirQuality(AirQuality airQuality) {
+//        synchronized (this) {
+//            this.airQuality = airQuality;
+//            city_id = airQuality == null ? null : airQuality.getCity_id();
+//            airQuality__resolvedKey = city_id;
+//        }
+//    }
+//
+//
+
+
+
+
 
 }

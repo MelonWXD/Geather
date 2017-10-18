@@ -28,9 +28,11 @@ import com.dongua.geather.R;
 import com.dongua.geather.bean.state.City;
 import com.dongua.geather.bean.state.Region;
 import com.dongua.geather.bean.state.State;
+import com.dongua.geather.bean.weather.AirQuality;
 import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Weather;
+import com.dongua.geather.db.AirQualityDao;
 import com.dongua.geather.db.HourlyWeatherDao;
 import com.dongua.geather.ui.base.BaseActivity;
 import com.dongua.geather.ui.customview.CommomDialog;
@@ -296,10 +298,11 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
     private void initViewData() {
         List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
-
         if(weatherList==null || weatherList.size()==0){
             mPresenter.showWeatherInfo();//设置当前城市
         }else {
+//            LogUtil.I(weatherList.get(0).getAirQuality().getAqi());
+
             // TODO: 17-10-17  add vp to main Acty
             for (Weather w : weatherList) {
                 intiView(w);
@@ -325,6 +328,18 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
         }
         updateView(hourlyWeathers,max,min);
+
+        List<AirQuality> airQualityList = App.getDaoSession().getAirQualityDao().queryBuilder()
+                .where(AirQualityDao.Properties.City_id.eq(w.getCity_id())).list();
+        if(!airQualityList.isEmpty()){
+            updateView(airQualityList.get(0));
+        }
+
+        mPresenter.checkUpdate();
+    }
+
+    private void updateView(AirQuality airQuality) {
+        LogUtil.I(airQuality.toString());
     }
 
 
