@@ -150,7 +150,7 @@ public class WeatherModel {
     //    String ipAddr = null;
 //    String cityID = null;
 //    String updateTime = null;
-
+//
     public void getWeatherByIp() {
         mNetClient.getCurCityIP()
                 .subscribeOn(Schedulers.io())
