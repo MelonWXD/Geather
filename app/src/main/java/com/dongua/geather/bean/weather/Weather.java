@@ -35,6 +35,7 @@ public class Weather {
     private String date;
     private String sunrise;
     private String sunset;
+    private String code;
 
 
     //now
@@ -76,11 +77,10 @@ public class Weather {
     /** Used for active entity operations. */
     @Generated(hash = 1275646288)
     private transient WeatherDao myDao;
-    @Generated(hash = 656715684)
-    public Weather(Long id, String city_name, String city_id, String update_date,
-                   String date, String sunrise, String sunset, String text_now,
-                   String temperature, String wind_dir, String wind_speed,
-                   String visibility, String pressure) {
+    @Generated(hash = 1837347540)
+    public Weather(Long id, String city_name, String city_id, String update_date, String date,
+            String sunrise, String sunset, String code, String text_now, String temperature,
+            String wind_dir, String wind_speed, String visibility, String pressure) {
         this.id = id;
         this.city_name = city_name;
         this.city_id = city_id;
@@ -88,6 +88,7 @@ public class Weather {
         this.date = date;
         this.sunrise = sunrise;
         this.sunset = sunset;
+        this.code = code;
         this.text_now = text_now;
         this.temperature = temperature;
         this.wind_dir = wind_dir;
@@ -95,6 +96,7 @@ public class Weather {
         this.visibility = visibility;
         this.pressure = pressure;
     }
+
     @Generated(hash = 556711069)
     public Weather() {
     }
@@ -292,6 +294,14 @@ public class Weather {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getWeatherDao() : null;
+    }
+
+    public String getCode() {
+        return this.code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
 }

@@ -2,15 +2,24 @@
     <string name="app_name">Geather</string>
     <string name="cancel">取消</string>
     <string name="submit">确定</string>
-
     <string name="add_city">添加城市</string>
 
 
 
+
+    <string name="cur_tempture">%1$s°</string>
     <string name="text_visibility">可见度</string>
     <string name="text_pressure">气压</string>
     <string name="wind">%1$s风</string>
     <string name="level">%1$d级</string>
     <string name="forecast_temp">%1$s°/%2$s°</string>
-    <!--<string name="level">%1$d级</string>-->
+
+
+    <string name="forecast_info">10天趋势预报</string>
+
+
+    <string name="aqi_title">空气质量</string>
+    <string name="aqi_quality">%1$s</string>
+    <string name="aqi_publishtime">%1$s发布</string>
+
 </resources>

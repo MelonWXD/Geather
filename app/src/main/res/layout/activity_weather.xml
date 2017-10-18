@@ -156,7 +156,7 @@
 
                     <TextView
                         style="@style/CenterTextView"
-                        android:text="15天趋势预报" />
+                        android:text="@string/forecast_info" />
 
                 </LinearLayout>
 
@@ -209,10 +209,11 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/aqi_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
-                        android:text="空气质量"
+                        android:text="@string/aqi_title"
                         android:textSize="20sp" />
 
                     <View
@@ -223,12 +224,12 @@
                         android:background="@color/linen" />
 
                     <TextView
-                        android:id="@+id/aqi_title"
+                        android:id="@+id/aqi_quality"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
                         android:padding="10dp"
-                        android:text="优"
+                        android:text="@string/aqi_quality"
                         android:textSize="20sp" />
 
                     <TextView
@@ -238,7 +239,7 @@
                         android:layout_weight="1"
                         android:textColor="@color/gray"
                         android:padding="5dp"
-                        android:text="15:00发布"
+                        android:text="@string/aqi_publishtime"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -290,6 +291,7 @@
         android:visibility="invisible">
 
         <ImageView
+            android:id="@+id/header_image"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:background="@drawable/weather"

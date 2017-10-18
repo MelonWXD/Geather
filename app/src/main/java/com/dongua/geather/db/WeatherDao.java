@@ -31,12 +31,13 @@ public class WeatherDao extends AbstractDao<Weather, Long> {
         public final static Property Date = new Property(4, String.class, "date", false, "DATE");
         public final static Property Sunrise = new Property(5, String.class, "sunrise", false, "SUNRISE");
         public final static Property Sunset = new Property(6, String.class, "sunset", false, "SUNSET");
-        public final static Property Text_now = new Property(7, String.class, "text_now", false, "TEXT_NOW");
-        public final static Property Temperature = new Property(8, String.class, "temperature", false, "TEMPERATURE");
-        public final static Property Wind_dir = new Property(9, String.class, "wind_dir", false, "WIND_DIR");
-        public final static Property Wind_speed = new Property(10, String.class, "wind_speed", false, "WIND_SPEED");
-        public final static Property Visibility = new Property(11, String.class, "visibility", false, "VISIBILITY");
-        public final static Property Pressure = new Property(12, String.class, "pressure", false, "PRESSURE");
+        public final static Property Code = new Property(7, String.class, "code", false, "CODE");
+        public final static Property Text_now = new Property(8, String.class, "text_now", false, "TEXT_NOW");
+        public final static Property Temperature = new Property(9, String.class, "temperature", false, "TEMPERATURE");
+        public final static Property Wind_dir = new Property(10, String.class, "wind_dir", false, "WIND_DIR");
+        public final static Property Wind_speed = new Property(11, String.class, "wind_speed", false, "WIND_SPEED");
+        public final static Property Visibility = new Property(12, String.class, "visibility", false, "VISIBILITY");
+        public final static Property Pressure = new Property(13, String.class, "pressure", false, "PRESSURE");
     }
 
     private DaoSession daoSession;
@@ -62,12 +63,13 @@ public class WeatherDao extends AbstractDao<Weather, Long> {
                 "\"DATE\" TEXT," + // 4: date
                 "\"SUNRISE\" TEXT," + // 5: sunrise
                 "\"SUNSET\" TEXT," + // 6: sunset
-                "\"TEXT_NOW\" TEXT," + // 7: text_now
-                "\"TEMPERATURE\" TEXT," + // 8: temperature
-                "\"WIND_DIR\" TEXT," + // 9: wind_dir
-                "\"WIND_SPEED\" TEXT," + // 10: wind_speed
-                "\"VISIBILITY\" TEXT," + // 11: visibility
-                "\"PRESSURE\" TEXT);"); // 12: pressure
+                "\"CODE\" TEXT," + // 7: code
+                "\"TEXT_NOW\" TEXT," + // 8: text_now
+                "\"TEMPERATURE\" TEXT," + // 9: temperature
+                "\"WIND_DIR\" TEXT," + // 10: wind_dir
+                "\"WIND_SPEED\" TEXT," + // 11: wind_speed
+                "\"VISIBILITY\" TEXT," + // 12: visibility
+                "\"PRESSURE\" TEXT);"); // 13: pressure
     }
 
     /** Drops the underlying database table. */
@@ -115,34 +117,39 @@ public class WeatherDao extends AbstractDao<Weather, Long> {
             stmt.bindString(7, sunset);
         }
  
+        String code = entity.getCode();
+        if (code != null) {
+            stmt.bindString(8, code);
+        }
+ 
         String text_now = entity.getText_now();
         if (text_now != null) {
-            stmt.bindString(8, text_now);
+            stmt.bindString(9, text_now);
         }
  
         String temperature = entity.getTemperature();
         if (temperature != null) {
-            stmt.bindString(9, temperature);
+            stmt.bindString(10, temperature);
         }
  
         String wind_dir = entity.getWind_dir();
         if (wind_dir != null) {
-            stmt.bindString(10, wind_dir);
+            stmt.bindString(11, wind_dir);
         }
  
         String wind_speed = entity.getWind_speed();
         if (wind_speed != null) {
-            stmt.bindString(11, wind_speed);
+            stmt.bindString(12, wind_speed);
         }
  
         String visibility = entity.getVisibility();
         if (visibility != null) {
-            stmt.bindString(12, visibility);
+            stmt.bindString(13, visibility);
         }
  
         String pressure = entity.getPressure();
         if (pressure != null) {
-            stmt.bindString(13, pressure);
+            stmt.bindString(14, pressure);
         }
     }
 
@@ -185,34 +192,39 @@ public class WeatherDao extends AbstractDao<Weather, Long> {
             stmt.bindString(7, sunset);
         }
  
+        String code = entity.getCode();
+        if (code != null) {
+            stmt.bindString(8, code);
+        }
+ 
         String text_now = entity.getText_now();
         if (text_now != null) {
-            stmt.bindString(8, text_now);
+            stmt.bindString(9, text_now);
         }
  
         String temperature = entity.getTemperature();
         if (temperature != null) {
-            stmt.bindString(9, temperature);
+            stmt.bindString(10, temperature);
         }
  
         String wind_dir = entity.getWind_dir();
         if (wind_dir != null) {
-            stmt.bindString(10, wind_dir);
+            stmt.bindString(11, wind_dir);
         }
  
         String wind_speed = entity.getWind_speed();
         if (wind_speed != null) {
-            stmt.bindString(11, wind_speed);
+            stmt.bindString(12, wind_speed);
         }
  
         String visibility = entity.getVisibility();
         if (visibility != null) {
-            stmt.bindString(12, visibility);
+            stmt.bindString(13, visibility);
         }
  
         String pressure = entity.getPressure();
         if (pressure != null) {
-            stmt.bindString(13, pressure);
+            stmt.bindString(14, pressure);
         }
     }
 
@@ -237,12 +249,13 @@ public class WeatherDao extends AbstractDao<Weather, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // date
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // sunrise
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // sunset
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // text_now
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // temperature
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // wind_dir
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // wind_speed
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // visibility
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // pressure
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // code
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // text_now
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // temperature
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // wind_dir
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // wind_speed
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // visibility
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13) // pressure
         );
         return entity;
     }
@@ -256,12 +269,13 @@ public class WeatherDao extends AbstractDao<Weather, Long> {
         entity.setDate(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setSunrise(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setSunset(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setText_now(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setTemperature(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setWind_dir(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setWind_speed(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setVisibility(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setPressure(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setCode(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setText_now(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setTemperature(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setWind_dir(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setWind_speed(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setVisibility(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setPressure(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
      }
     
     @Override

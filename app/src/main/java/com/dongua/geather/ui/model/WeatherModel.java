@@ -208,6 +208,7 @@ public class WeatherModel {
 
             JsonObject nowJson = weatherJson.get("now").getAsJsonObject();
             String now_text = nowJson.get("text").getAsString();
+            String now_code = nowJson.get("code").getAsString();
             String temperature = nowJson.get("temperature").getAsString();
             String wind_dir = nowJson.get("wind_direction").getAsString();
             String wind_speed = nowJson.get("wind_speed").getAsString();
@@ -225,9 +226,11 @@ public class WeatherModel {
             String dateStr = formatter.format(date);
 
 
-            weather = new Weather(null, cityName, cityId, last_update, dateStr, sunrise, sunset,
-                    now_text, temperature, wind_dir, wind_speed, visibility, pressure);
-
+//            weather = new Weather(null, cityName, cityId, last_update, dateStr, sunrise, sunset,
+//                    now_text, temperature, wind_dir, wind_speed, visibility, pressure);
+            //查询得到的cityID和返回的cityId不同
+            weather = new Weather(null, cityName, cityID, last_update, dateStr, sunrise, sunset,
+                    now_code,now_text, temperature, wind_dir, wind_speed, visibility, pressure);
 
             //存Suggestion
             List<Suggestion> suggestionList = new ArrayList<>();
@@ -236,7 +239,7 @@ public class WeatherModel {
             for (int i = 0; i < suggestName.length; i++) {
                 String brief = suggest.get(suggestName[i]).getAsJsonObject().get("brief").getAsString();
                 String details = suggest.get(suggestName[i]).getAsJsonObject().get("details").getAsString();
-                Suggestion suggestion = new Suggestion(null, cityId, suggestName[i], brief, details);
+                Suggestion suggestion = new Suggestion(null, cityID, suggestName[i], brief, details);
                 suggestionList.add(suggestion);
                 App.getDaoSession().getSuggestionDao().save(suggestion);
             }
@@ -254,7 +257,7 @@ public class WeatherModel {
                 String text = futureJA.get(i).getAsJsonObject().get("text").getAsString();
                 String wind = futureJA.get(i).getAsJsonObject().get("wind").getAsString();
                 String code = futureJA.get(i).getAsJsonObject().get("code1").getAsString();
-                Future future = new Future(null, cityId, futuredate, day, high, low, text, code,wind);
+                Future future = new Future(null, cityID, futuredate, day, high, low, text, code,wind);
                 futureList.add(future);
                 App.getDaoSession().getFutureDao().save(future);
             }

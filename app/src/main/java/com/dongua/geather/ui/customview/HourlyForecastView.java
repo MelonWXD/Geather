@@ -15,6 +15,7 @@ import android.view.View;
 
 import com.dongua.geather.R;
 import com.dongua.geather.bean.weather.HourlyWeather;
+import com.dongua.geather.utils.LogUtil;
 import com.dongua.geather.utils.Utils;
 
 import java.util.ArrayList;
@@ -270,7 +271,7 @@ public class HourlyForecastView extends View implements ScrollWatcher {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
+        LogUtil.I("Hourly onDraw");
         //drawCircle
         if (hourlyWeatherList.size() != 0) {
             drawLines(canvas);

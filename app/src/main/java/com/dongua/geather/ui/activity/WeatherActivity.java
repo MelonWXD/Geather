@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -81,6 +82,14 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     TextView cur_CityName;
     @BindView(R.id.realtime_text)
     TextView cur_CityText;
+
+
+    @BindView(R.id.header_image)
+    ImageView header_image;
+    @BindView(R.id.header_cityname)
+    TextView header_cityname;
+    @BindView(R.id.header_temperature)
+    TextView header_temperature;
 
     @BindView(R.id.header_area)
     LinearLayout header;
@@ -186,9 +195,18 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
         LogUtil.I("updateView:" + weather.toString());
 
-        cur_Temperature.setText(weather.getTemperature());
-        cur_CityName.setText(weather.getCity_name());
-        cur_CityText.setText(weather.getText_now());
+
+        String tempture = String.format(getResources().getString(R.string.cur_tempture), weather.getTemperature());
+        String cityName =weather.getCity_name();
+        String cityText =weather.getText_now() ;
+        cur_Temperature.setText(tempture);
+        cur_CityName.setText(cityName);
+        cur_CityText.setText(cityText);
+
+        header_cityname.setText(cityName);
+        header_temperature.setText(tempture);
+        Glide.with(this).load(UIUtils.getImageResID(Integer.parseInt(weather.getCode()))).into(header_image);
+
 
         //风向
         TextView titleWind = (TextView) cur_Wind.findViewById(R.id.title);
@@ -419,16 +437,16 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         });
 
 
-        List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
-        Gson gson = new Gson();
-        JsonObject jo = new JsonParser().parse(data).getAsJsonObject();
-        JsonArray ja = jo.getAsJsonArray("hourly");
-
-        for (JsonElement element : ja) {
-            HourlyWeather bean = gson.fromJson(element, HourlyWeather.class);
-            hourlyWeatherList.add(bean);
-        }
-        updateView(hourlyWeatherList, 16, 27);
+//        List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
+//        Gson gson = new Gson();
+//        JsonObject jo = new JsonParser().parse(data).getAsJsonObject();
+//        JsonArray ja = jo.getAsJsonArray("hourly");
+//
+//        for (JsonElement element : ja) {
+//            HourlyWeather bean = gson.fromJson(element, HourlyWeather.class);
+//            hourlyWeatherList.add(bean);
+//        }
+//        updateView(hourlyWeatherList, 16, 27);
     }
 
     private void updateHourlyView(List<HourlyWeather> hourlyWeatherList, int high, int low) {
@@ -449,7 +467,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         hourlyForecastView.setLowestTemp(low);
         hourlyForecastView.initData(hourlyWeatherList);
 
-        hourlyForecastView.invalidate();
+        hourlyForecastView.requestLayout();
 
 
     }
