@@ -16,6 +16,7 @@ import android.view.View;
 import com.dongua.geather.R;
 import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.utils.LogUtil;
+import com.dongua.geather.utils.UIUtils;
 import com.dongua.geather.utils.Utils;
 
 import java.util.ArrayList;
@@ -173,7 +174,7 @@ public class HourlyForecastView extends View implements ScrollWatcher {
         paddingL = Utils.dp2px(mContext, 30);
         paddingR = Utils.dp2px(mContext, 30);
 
-        textSize = Utils.sp2px(mContext, 16);
+        textSize = Utils.sp2px(mContext, 14);
 
 
         bitmapHeight = 1 / 2f * (2*defHeightPixel - lowestTempHeight) - textSize/2;//- 给文字留地方
@@ -359,30 +360,8 @@ public class HourlyForecastView extends View implements ScrollWatcher {
 
     private Bitmap getBitmapByCode(int code) {
         BitmapDrawable bd = null;
-        switch (code) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                bd = (BitmapDrawable) getResources().getDrawable(R.drawable.qing);
-                break;
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-                bd = (BitmapDrawable) getResources().getDrawable(R.drawable.duoyun);
-                break;
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-                bd = (BitmapDrawable) getResources().getDrawable(R.drawable.yu);
-                break;
-            default:
-                bd = (BitmapDrawable) getResources().getDrawable(R.drawable.shape);
-                break;
-        }
-
+        int Rid = UIUtils.getImageResID(code);
+        bd = (BitmapDrawable) getResources().getDrawable(Rid);
         //压缩图片
         Bitmap bitmap = Utils.bitmapResize(bd.getBitmap(), Utils.dp2px(mContext, 32), Utils.dp2px(mContext, 32));
 

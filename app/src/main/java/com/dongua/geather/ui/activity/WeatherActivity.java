@@ -121,6 +121,13 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     @BindView(R.id.hourly_forecast)
     HourlyForecastView hourlyForecastView;
 
+
+    @BindView(R.id.aqi_bar)
+    RoundRatioBar aqiRatioBar;
+    @BindView(R.id.pm25_bar)
+    RoundRatioBar pm25RatioBar;
+
+
     private List<ScrollWatcher> watcherList = new ArrayList<>();
     //init observer
     ScrollWatched watched = new ScrollWatched() {
@@ -293,7 +300,6 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         initViewData();
 
 
-//        mPresenter.showWeatherInfo();
     }
 
     private void initViewData() {
@@ -340,6 +346,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
     private void updateView(AirQuality airQuality) {
         LogUtil.I(airQuality.toString());
+        updateRatioBar(airQuality);
     }
 
 
@@ -423,20 +430,37 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
     private void initRatioBar() {
 
-        RoundRatioBar aqiRatioBar = (RoundRatioBar) findViewById(R.id.aqi_bar);
 
-        RoundRatioBar pm25RatioBar = (RoundRatioBar) findViewById(R.id.pm25_bar);
+        updateRatioBar(null);
 
-        aqiRatioBar.setPercentValue(0.6);
-        aqiRatioBar.setAbbr_text("AQI");
-        aqiRatioBar.setDesc_text("空气质量指数");
-        aqiRatioBar.setValue_text("98");
 
-        pm25RatioBar.setPercentValue(0.3);
+    }
+
+    private void updateRatioBar(AirQuality airQuality) {
+        if(airQuality==null){
+            aqiRatioBar.setPercentValue(0);
+            aqiRatioBar.setValue_text("0");
+            pm25RatioBar.setPercentValue(0);
+            pm25RatioBar.setValue_text("0");
+        }else {
+            String aqiVal = airQuality.getAqi();
+            Float aqiPer = Float.parseFloat(aqiVal)/500;
+            String pm25Val = airQuality.getPm25();
+            Float pm25Per = Float.parseFloat(pm25Val)/500;
+            aqiRatioBar.setPercentValue(aqiPer);
+            aqiRatioBar.setValue_text(aqiVal);
+            pm25RatioBar.setPercentValue(pm25Per);
+            pm25RatioBar.setValue_text(pm25Val);
+        }
+
+
         pm25RatioBar.setAbbr_text("PM2.5");
         pm25RatioBar.setDesc_text("首要污染物");
-        pm25RatioBar.setValue_text("36");
+        aqiRatioBar.setAbbr_text("AQI");
+        aqiRatioBar.setDesc_text("空气质量指数");
 
+        aqiRatioBar.requestLayout();
+        pm25RatioBar.requestLayout();
     }
 
 

@@ -101,29 +101,6 @@ public class CommomDialog extends Dialog implements View.OnClickListener {
             titleTxt.setText(title);
         }
 
-        LinearLayout content = (LinearLayout) findViewById(R.id.content);
-        PickerView state = (PickerView) content.findViewById(R.id.state);
-        PickerView city = (PickerView) content.findViewById(R.id.city);
-        PickerView region = (PickerView) content.findViewById(R.id.region);
-
-        PickerAdapter stateAdapter = new PickerAdapter(mContext);
-        PickerAdapter cityAdapter = new PickerAdapter(mContext);
-        PickerAdapter regionAdapter = new PickerAdapter(mContext);
-
-        LocationModel lm = new LocationModel();
-        Map<String,Map<String,List<String>>> data = lm.getCityInfo();
-
-        stateAdapter.setData(new ArrayList<>(data.keySet()));
-        cityAdapter.setData(new ArrayList<>(data.get("北京").keySet()));
-        regionAdapter.setData(new ArrayList<>(data.get("北京").get("东城")));
-
-        state.setAdapter(stateAdapter);
-        city.setAdapter(cityAdapter);
-        region.setAdapter(regionAdapter);
-
-
-
-
 
     }
 
