@@ -22,7 +22,7 @@ import static com.dongua.geather.utils.Constant.SP_LOCDB;
  * Created by dongua on 17-7-30.
  */
 
-public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkListener {
+public class WeatherPresenter implements BasePresenter<WeatherView>, OnNetworkListener {
 
     WeatherModel mWeatherModel;
     WeatherView mWeatherView;
@@ -37,9 +37,14 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
         mLocModel = new LocationModel();
     }
 
-    public void showWeatherInfo(){
-        mWeatherModel.getWeatherByIp();
+    public void showWeatherInfo(String cityID) {
+        if (cityID == null) {
+            mWeatherModel.getWeatherByIp();
 //        mWeatherModel.getWeatherJson(ipOrName);
+        } else {
+            mWeatherModel.getCityWeatherByID(cityID);
+            mWeatherModel.getHourlyByID(cityID);
+        }
     }
 
 
@@ -59,12 +64,12 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
 
     @Override
     public void successed(Weather weather) {
-        mWeatherView.update(weather,MSG_WEATHER_DATA);
+        mWeatherView.update(weather, MSG_WEATHER_DATA);
     }
 
     @Override
     public void successed(List<HourlyWeather> hourlyWeathers) {
-        mWeatherView.update(hourlyWeathers,MSG_HOURLY_WEATHER_DATA);
+        mWeatherView.update(hourlyWeathers, MSG_HOURLY_WEATHER_DATA);
 
     }
 
@@ -84,10 +89,10 @@ public class WeatherPresenter implements BasePresenter<WeatherView>,OnNetworkLis
     class locDBThread extends Thread {
         @Override
         public void run() {
-            if(mLocModel.saveLocDB()){
-                SharedPreferenceUtil.putSharedPreferences(AppManager.getInstance().getAppContext(),SP_LOCDB,true);
+            if (mLocModel.saveLocDB()) {
+                SharedPreferenceUtil.putSharedPreferences(AppManager.getInstance().getAppContext(), SP_LOCDB, true);
                 LogUtil.I("loc db save successful");
-            }else {
+            } else {
                 LogUtil.I("loc db save fail");
             }
         }

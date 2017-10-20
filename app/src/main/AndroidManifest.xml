@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/QMUIStyle">
 
-        <activity android:name=".ui.activity.WeatherActivity"
+        <activity android:name=".ui.activity.MainActivity"
             android:hardwareAccelerated="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>

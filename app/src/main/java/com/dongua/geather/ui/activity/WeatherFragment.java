@@ -4,13 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
@@ -23,7 +22,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.dongua.geather.App;
-import com.dongua.geather.AppManager;
 import com.dongua.geather.R;
 import com.dongua.geather.bean.state.City;
 import com.dongua.geather.bean.state.Region;
@@ -34,7 +32,7 @@ import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.db.AirQualityDao;
 import com.dongua.geather.db.HourlyWeatherDao;
-import com.dongua.geather.ui.base.BaseActivity;
+import com.dongua.geather.ui.base.BaseFragment;
 import com.dongua.geather.ui.customview.CommomDialog;
 import com.dongua.geather.ui.customview.HourlyForecastView;
 import com.dongua.geather.ui.customview.RoundRatioBar;
@@ -45,11 +43,6 @@ import com.dongua.geather.ui.view.WeatherView;
 import com.dongua.geather.utils.LogUtil;
 import com.dongua.geather.utils.SharedPreferenceUtil;
 import com.dongua.geather.utils.UIUtils;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,6 +50,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 import static com.dongua.geather.R.style.dialog;
 import static com.dongua.geather.utils.Constant.MSG_HOURLY_WEATHER_DATA;
@@ -67,7 +61,7 @@ import static com.dongua.geather.utils.Constant.SP_LOCDB;
  * Created by dongua on 17-7-30.
  */
 
-public class WeatherActivity extends BaseActivity implements WeatherView {
+public class WeatherFragment extends BaseFragment implements WeatherView {
 
     private WeatherPresenter mPresenter;
     private Context mContext;
@@ -126,6 +120,10 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     RoundRatioBar aqiRatioBar;
     @BindView(R.id.pm25_bar)
     RoundRatioBar pm25RatioBar;
+
+    @BindView(R.id.iv_toolbar_right)
+    ImageView ivToolbarRight;
+
 
 
     private List<ScrollWatcher> watcherList = new ArrayList<>();
@@ -193,6 +191,99 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         }
     };
 
+
+    public void setCityID(String cityID) {
+        this.cityID = cityID;
+    }
+
+    String cityID;
+    Unbinder unbinder;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
+
+
+        View view = inflater.inflate(R.layout.fragment_weather, container, false);
+        unbinder = ButterKnife.bind(this, view);
+
+
+        initPresent();
+
+        initView();
+
+        initCityDB();
+
+        initViewData();
+
+        initListener();
+//        return setContentWithToolBar(view);
+        return view;
+
+
+    }
+
+    private void initListener() {
+        ivToolbarRight.setOnClickListener(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    private void initViewData() {
+        List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
+        if (weatherList == null || weatherList.size() == 0) {
+
+                mPresenter.showWeatherInfo(cityID);//设置当前城市
+
+        } else {
+//            LogUtil.I(weatherList.get(0).getAirQuality().getAqi());
+
+            // TODO: 17-10-17  add vp to main Acty
+            for (Weather w : weatherList) {
+                intiView(w);
+            }
+        }
+    }
+
+    private void intiView(Weather w) {
+        updateView(w);
+        List<HourlyWeather> hourlyWeathers = App.getDaoSession().getHourlyWeatherDao().queryBuilder()
+                .where(HourlyWeatherDao.Properties.City_id.eq(w.getCity_id()))
+                .list();
+        int max = 0;
+        int min = 99;
+        for (HourlyWeather hourly : hourlyWeathers) {
+            int tmp = Integer.parseInt(hourly.getTemperature());
+            if (tmp > max) {
+                max = tmp;
+            }
+            if (min > tmp) {
+                min = tmp;
+            }
+
+        }
+        updateView(hourlyWeathers, max, min);
+
+        List<AirQuality> airQualityList = App.getDaoSession().getAirQualityDao().queryBuilder()
+                .where(AirQualityDao.Properties.City_id.eq(w.getCity_id())).list();
+        if (!airQualityList.isEmpty()) {
+            updateView(airQualityList.get(0));
+        }
+
+        mPresenter.checkUpdate();
+    }
+
+    private void updateView(AirQuality airQuality) {
+        LogUtil.I(airQuality.toString());
+        updateRatioBar(airQuality);
+    }
+
+
     private void updateView(List<HourlyWeather> hourlyWeathers, int high, int low) {
         LogUtil.I("updateView: hourly" + hourlyWeathers.size());
 
@@ -206,8 +297,8 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
 
         String tempture = String.format(getResources().getString(R.string.cur_tempture), weather.getTemperature());
-        String cityName =weather.getCity_name();
-        String cityText =weather.getText_now() ;
+        String cityName = weather.getCity_name();
+        String cityText = weather.getText_now();
         cur_Temperature.setText(tempture);
         cur_CityName.setText(cityName);
         cur_CityText.setText(cityText);
@@ -280,78 +371,8 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        AppManager.getInstance().addActivity(this);
-        mContext = this;
-        setContentView(R.layout.activity_weather);
-        ButterKnife.bind(this);
-
-
-        initPresent();
-
-        initView();
-
-        initCityDB();
-
-        initViewData();
-
-
-    }
-
-    private void initViewData() {
-        List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
-        if(weatherList==null || weatherList.size()==0){
-            mPresenter.showWeatherInfo();//设置当前城市
-        }else {
-//            LogUtil.I(weatherList.get(0).getAirQuality().getAqi());
-
-            // TODO: 17-10-17  add vp to main Acty
-            for (Weather w : weatherList) {
-                intiView(w);
-            }
-        }
-    }
-
-    private void intiView(Weather w) {
-        updateView(w);
-        List<HourlyWeather> hourlyWeathers = App.getDaoSession().getHourlyWeatherDao().queryBuilder()
-                .where(HourlyWeatherDao.Properties.City_id.eq(w.getCity_id()))
-                .list();
-        int max = 0;
-        int min = 99;
-        for(HourlyWeather hourly:hourlyWeathers){
-            int tmp = Integer.parseInt(hourly.getTemperature());
-            if(tmp>max){
-                max = tmp;
-            }
-            if(min>tmp){
-                min = tmp;
-            }
-
-        }
-        updateView(hourlyWeathers,max,min);
-
-        List<AirQuality> airQualityList = App.getDaoSession().getAirQualityDao().queryBuilder()
-                .where(AirQualityDao.Properties.City_id.eq(w.getCity_id())).list();
-        if(!airQualityList.isEmpty()){
-            updateView(airQualityList.get(0));
-        }
-
-        mPresenter.checkUpdate();
-    }
-
-    private void updateView(AirQuality airQuality) {
-        LogUtil.I(airQuality.toString());
-        updateRatioBar(airQuality);
-    }
-
-
     private void initCityDB() {
-        if (!(boolean) SharedPreferenceUtil.getSharedPreferences(this, SP_LOCDB, false)) {
+        if (!(boolean) SharedPreferenceUtil.getSharedPreferences(this.getContext(), SP_LOCDB, false)) {
             LogUtil.I("SP不存在 生成城市db");
             mPresenter.makeLocDB();
         } else {
@@ -437,16 +458,16 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
     }
 
     private void updateRatioBar(AirQuality airQuality) {
-        if(airQuality==null){
+        if (airQuality == null) {
             aqiRatioBar.setPercentValue(0);
             aqiRatioBar.setValue_text("0");
             pm25RatioBar.setPercentValue(0);
             pm25RatioBar.setValue_text("0");
-        }else {
+        } else {
             String aqiVal = airQuality.getAqi();
-            Float aqiPer = Float.parseFloat(aqiVal)/500;
+            Float aqiPer = Float.parseFloat(aqiVal) / 500;
             String pm25Val = airQuality.getPm25();
-            Float pm25Per = Float.parseFloat(pm25Val)/500;
+            Float pm25Per = Float.parseFloat(pm25Val) / 500;
             aqiRatioBar.setPercentValue(aqiPer);
             aqiRatioBar.setValue_text(aqiVal);
             pm25RatioBar.setPercentValue(pm25Per);
@@ -514,25 +535,14 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
+
 //        header.setVisibility(View.VISIBLE);
 
         headerHeight = header.getHeight();
         footerTop = footer.getTop();
         footerHeight = footer.getHeight();
         headerDistance = Math.abs(footerHeight - headerHeight);
-//        LogUtil.I(footerTop + "," + footerHeight + "," + headerHeight);
 
-        if (hasFocus && Build.VERSION.SDK_INT >= 19) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
 
     }
 
@@ -554,7 +564,7 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
 
     private void showPoupWindow(View view) {
 
-        View popupView = WeatherActivity.this.getLayoutInflater().inflate(R.layout.popup_menu, null);
+        View popupView = WeatherFragment.this.getActivity().getLayoutInflater().inflate(R.layout.popup_menu, null);
 
         TextView tv = (TextView) popupView.findViewById(R.id.add_city);
         tv.setOnClickListener(new View.OnClickListener() {
@@ -606,19 +616,6 @@ public class WeatherActivity extends BaseActivity implements WeatherView {
         mHandler.sendMessage(message);
     }
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-//        EventBus.getDefault().unregister(this);
-
-    }
 
     String data = " {\"hourly\":[" +
             "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"17\",\"time\":\"02:00\"}," +

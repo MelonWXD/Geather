@@ -180,7 +180,7 @@ public class WeatherModel {
 
     }
 
-    private void getCityWeatherByID(String cityID) {
+    public void getCityWeatherByID(String cityID) {
         mNetClient.getCityWeather(cityID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
