@@ -1,7 +1,5 @@
 package com.dongua.geather.ui.view;
 
-import com.dongua.geather.bean.weather.Weather;
-import com.dongua.geather.ui.base.BaseView;
 import com.dongua.geather.ui.presenter.WeatherPresenter;
 
 /**

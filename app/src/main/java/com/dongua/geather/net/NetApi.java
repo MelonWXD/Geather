@@ -69,12 +69,12 @@ public class NetApi {
 //    }
 
 
-    public Observable<Response<ResponseBody>> getCurCityIP(){
+    public Observable<Response<ResponseBody>> getCurCityIP() {
         return mWeatherService.getCurCityIP();
     }
 
 
-    public Observable<ResponseBody> getCityID(String ip){
+    public Observable<ResponseBody> getCityID(String ip) {
         return mWeatherService.getCityID(ip);
     }
 
@@ -84,7 +84,13 @@ public class NetApi {
     }
 
 
-    public Observable<ResponseBody> getCity24H (String cityID){
+    public Observable<ResponseBody> getCity24H(String cityID) {
         return mWeatherService.getCity24(cityID);
     }
+
+    public Observable<Response<ResponseBody>> getWeatherUpdate(String cityID) {
+        return mWeatherService.getWeatherUpdateTime(cityID);
+    }
+
+
 }

@@ -21,6 +21,10 @@ public class Constant {
 
 
     public static final String SP_LOCDB = "SP_LOCDB";
+    public static final String SP_CITY_SIZE = "SP_CITY_SIZE";
+    public static final String SP_CITY_PREFIX = "SP_CITY_PREFIX_";
+
+
 
 
     public static final int DATA_STATE = 0x01;

@@ -1,11 +1,15 @@
 package com.dongua.geather.ui.model;
 
+import android.util.Log;
+
 import com.dongua.geather.App;
 import com.dongua.geather.bean.weather.AirQuality;
 import com.dongua.geather.bean.weather.Future;
 import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Suggestion;
 import com.dongua.geather.bean.weather.Weather;
+import com.dongua.geather.db.FutureDao;
+import com.dongua.geather.db.SuggestionDao;
 import com.dongua.geather.db.WeatherDao;
 import com.dongua.geather.net.NetApi;
 import com.dongua.geather.ui.listener.OnNetworkListener;
@@ -45,7 +49,7 @@ import static com.dongua.geather.utils.Utils.logger;
  */
 
 public class WeatherModel {
-
+    private static final String TAG = "WeatherModel";
 
     OnNetworkListener mListener;
     NetApi mNetClient = NetApi.getInstance();
@@ -173,29 +177,39 @@ public class WeatherModel {
                         String cityID = ja.get(0).getAsJsonObject().get("id").getAsString();
                         LogUtil.I("id=" + cityID);
 
-                        getCityWeatherByID(cityID);
+                        getCityWeatherByID(cityID, null);
                         getHourlyByID(cityID);
                     }
                 });
 
     }
 
-    public void getCityWeatherByID(String cityID) {
+    public void getCityWeatherByID(String cityID, String updateTime) {
         mNetClient.getCityWeather(cityID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Consumer<ResponseBody>() {
                     @Override
                     public void accept(ResponseBody responseBody) throws Exception {
-                        mListener.successed(parseResponse2Weather(responseBody, cityID));
+                        Weather weather = parseResponse2Weather(responseBody, cityID, updateTime);
+
+                        mListener.successed(weather);
+
                     }
                 });
     }
 
 
-    //解析response 存数据库并返回
-    private Weather parseResponse2Weather(ResponseBody responseBody, String cityID) {
+    //解析response 更新数据库并返回
+    private Weather parseResponse2Weather(ResponseBody responseBody, String cityID, String updateTime) {
+
         Weather weather = null;
+        boolean dataExist = true;
+        //数据库查找cityID
+        if (updateTime == null) {
+            // !App.getDaoSession().getWeatherDao().queryBuilder().where(WeatherDao.Properties.City_id.eq(cityID)).list().isEmpty()
+            dataExist = false;
+        }
         try {
 
             String content = responseBody.string();//string只能调用一次 完了输入流即关闭
@@ -205,8 +219,11 @@ public class WeatherModel {
 
             JsonObject weatherJson = jsonArray.get(0).getAsJsonObject();
             String cityName = weatherJson.get("city_name").getAsString();
-            String cityId = weatherJson.get("city_id").getAsString();
+//            String cityId = weatherJson.get("city_id").getAsString();//这里的cityid是错的 妈的
             String last_update = weatherJson.get("last_update").getAsString();
+            if (updateTime != null && last_update.equals(updateTime)) {
+                return null;
+            }
 
             JsonObject nowJson = weatherJson.get("now").getAsJsonObject();
             String now_text = nowJson.get("text").getAsString();
@@ -232,7 +249,7 @@ public class WeatherModel {
 //                    now_text, temperature, wind_dir, wind_speed, visibility, pressure);
             //查询得到的cityID和返回的cityId不同
             weather = new Weather(null, cityName, cityID, last_update, dateStr, sunrise, sunset,
-                    now_code,now_text, temperature, wind_dir, wind_speed, visibility, pressure);
+                    now_code, now_text, temperature, wind_dir, wind_speed, visibility, pressure);
 
             //存Suggestion
             List<Suggestion> suggestionList = new ArrayList<>();
@@ -243,7 +260,15 @@ public class WeatherModel {
                 String details = suggest.get(suggestName[i]).getAsJsonObject().get("details").getAsString();
                 Suggestion suggestion = new Suggestion(null, cityID, suggestName[i], brief, details);
                 suggestionList.add(suggestion);
-                App.getDaoSession().getSuggestionDao().save(suggestion);
+                if(dataExist){
+                    Long id = App.getDaoSession().getSuggestionDao().queryBuilder()
+                    .where(SuggestionDao.Properties.City_id.eq(cityID)).list().get(0).getId();
+                    suggestion.setId(id);
+                    App.getDaoSession().getSuggestionDao().update(suggestion);
+                }else {
+                    App.getDaoSession().getSuggestionDao().save(suggestion);
+                }
+
             }
 
             weather.setSuggestions(suggestionList);
@@ -259,23 +284,43 @@ public class WeatherModel {
                 String text = futureJA.get(i).getAsJsonObject().get("text").getAsString();
                 String wind = futureJA.get(i).getAsJsonObject().get("wind").getAsString();
                 String code = futureJA.get(i).getAsJsonObject().get("code1").getAsString();
-                Future future = new Future(null, cityID, futuredate, day, high, low, text, code,wind);
+                Future future = new Future(null, cityID, futuredate, day, high, low, text, code, wind);
+
+                if(dataExist){
+                    Long id = App.getDaoSession().getFutureDao().queryBuilder()
+                            .where(FutureDao.Properties.City_id.eq(cityID)).list().get(0).getId();
+                    future.setId(id);
+                    App.getDaoSession().getFutureDao().update(future);
+                }else {
+                    App.getDaoSession().getFutureDao().save(future);
+                }
+
+
                 futureList.add(future);
-                App.getDaoSession().getFutureDao().save(future);
+
             }
 
             weather.setFuture(futureList);
 
             //存AirQuality
             JsonObject aqiJO = nowJson.get("air_quality").getAsJsonObject().get("city").getAsJsonObject();
-            AirQuality airQuality = new Gson().fromJson(aqiJO,AirQuality.class);
-            airQuality.setLast_update(aqiJO.get("last_update").getAsString().substring(11,16));
+            AirQuality airQuality = new Gson().fromJson(aqiJO, AirQuality.class);
+            airQuality.setLast_update(aqiJO.get("last_update").getAsString().substring(11, 16));
             airQuality.setCity_id(cityID);
             App.getDaoSession().getAirQualityDao().save(airQuality);
 
 //            weather.setAirQuality(airQuality);
 
-            App.getDaoSession().getWeatherDao().save(weather);
+            if(dataExist){
+                Long id = App.getDaoSession().getWeatherDao().queryBuilder()
+                        .where(WeatherDao.Properties.City_id.eq(cityID)).list().get(0).getId();
+                weather.setId(id);
+                App.getDaoSession().getWeatherDao().update(weather);
+            }else {
+                App.getDaoSession().getWeatherDao().save(weather);
+            }
+
+
 
         } catch (IOException e) {
             LogUtil.E(e.getMessage());
@@ -323,4 +368,7 @@ public class WeatherModel {
     }
 
 
+    public void checkUpdate(String cityID, String lastUpdateTime) {
+        getCityWeatherByID(cityID, lastUpdateTime);
+    }
 }

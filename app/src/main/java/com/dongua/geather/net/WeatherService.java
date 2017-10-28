@@ -9,6 +9,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.GET;
+import retrofit2.http.HEAD;
 import retrofit2.http.Query;
 
 /**
@@ -40,4 +41,7 @@ public interface WeatherService {
 
     @GET("weather/future24h")
     Observable<ResponseBody> getCity24(@Query("cityid")String cityID);
+
+    @GET("weather/now")
+    Observable<Response<ResponseBody>> getWeatherUpdateTime(@Query("cityid")String cityID);
 }

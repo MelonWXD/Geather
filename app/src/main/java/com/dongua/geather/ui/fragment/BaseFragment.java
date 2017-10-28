@@ -1,4 +1,4 @@
-package com.dongua.geather.ui.base;
+package com.dongua.geather.ui.fragment;
 
 
 import android.app.Dialog;
@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,9 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.dongua.geather.R;
-import com.dongua.geather.ui.activity.WeatherFragment;
 import com.dongua.geather.ui.customview.CommomDialog;
 import com.dongua.geather.ui.listener.IWindowFocusChangedListener;
+import com.dongua.geather.utils.LogUtil;
 import com.dongua.geather.utils.UIUtils;
 
 import static com.dongua.geather.R.style.dialog;
@@ -51,37 +52,27 @@ public abstract class BaseFragment extends Fragment implements IWindowFocusChang
         }
     }
 
-    protected  void showPopUpWindow(View view){
+    protected void showPopUpWindow(View view) {
         View popupView = this.getActivity().getLayoutInflater().inflate(R.layout.popup_menu, null);
         Context c = this.getContext();
-        TextView tv = (TextView) popupView.findViewById(R.id.add_city);
+        TextView tv = (TextView) popupView.findViewById(R.id.tv_toolbar_menu1);
         tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new CommomDialog(c, dialog, "您确定删除此信息？", new CommomDialog.OnCloseListener() {
+                                  @Override
+                                  public void onClick(View v) {
+                                      LogUtil.I("click");
+                                  }
+                              }
+        );
 
-                    @Override
-                    public void onClick(Dialog dialog, boolean confirm) {
-                        if (confirm) {
-                            UIUtils.showToast(dialog.getContext(), "confirm");
-                            dialog.dismiss();
-                        }
-                    }
-                })
-                        .setTitle("提示").show();
-            }
-        });
-
-        PopupWindow window = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT,
+        PopupWindow window = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, true);
         window.setAnimationStyle(R.style.popup_window_anim);
-        window.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F8F8F8")));
         window.setFocusable(true);
         window.setOutsideTouchable(true);
 
         window.update();
 
-        window.showAsDropDown(view, 0, 20);
+        window.showAtLocation(mRootLayout, Gravity.TOP,0, 0);
     }
 
     public View setContentWithToolBar(View view) {

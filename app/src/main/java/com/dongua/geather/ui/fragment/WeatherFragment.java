@@ -1,9 +1,7 @@
-package com.dongua.geather.ui.activity;
+package com.dongua.geather.ui.fragment;
 
-import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -32,8 +29,7 @@ import com.dongua.geather.bean.weather.HourlyWeather;
 import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.db.AirQualityDao;
 import com.dongua.geather.db.HourlyWeatherDao;
-import com.dongua.geather.ui.base.BaseFragment;
-import com.dongua.geather.ui.customview.CommomDialog;
+import com.dongua.geather.db.WeatherDao;
 import com.dongua.geather.ui.customview.HourlyForecastView;
 import com.dongua.geather.ui.customview.RoundRatioBar;
 import com.dongua.geather.ui.customview.ScrollWatched;
@@ -41,7 +37,6 @@ import com.dongua.geather.ui.customview.ScrollWatcher;
 import com.dongua.geather.ui.presenter.WeatherPresenter;
 import com.dongua.geather.ui.view.WeatherView;
 import com.dongua.geather.utils.LogUtil;
-import com.dongua.geather.utils.SharedPreferenceUtil;
 import com.dongua.geather.utils.UIUtils;
 
 import java.util.ArrayList;
@@ -52,10 +47,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.dongua.geather.R.style.dialog;
 import static com.dongua.geather.utils.Constant.MSG_HOURLY_WEATHER_DATA;
 import static com.dongua.geather.utils.Constant.MSG_WEATHER_DATA;
-import static com.dongua.geather.utils.Constant.SP_LOCDB;
 
 /**
  * Created by dongua on 17-7-30.
@@ -125,7 +118,6 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     ImageView ivToolbarRight;
 
 
-
     private List<ScrollWatcher> watcherList = new ArrayList<>();
     //init observer
     ScrollWatched watched = new ScrollWatched() {
@@ -172,6 +164,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     private TextView mWindSpdText;
 
 
+    @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -202,7 +195,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
 
 
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
@@ -213,7 +206,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 
         initView();
 
-        initCityDB();
+//        initCityDB();
 
         initViewData();
 
@@ -235,22 +228,37 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     }
 
     private void initViewData() {
-        List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
-        if (weatherList == null || weatherList.size() == 0) {
 
-                mPresenter.showWeatherInfo(cityID);//设置当前城市
+        mPresenter.checkUpdate("WX4FBXXFKE4F", "a");
+
+        if (cityID != null) {
+            Weather weather = App.getDaoSession().getWeatherDao().queryBuilder()
+                    .where(WeatherDao.Properties.City_id.eq(cityID))
+                    .list().get(0);
+
+            initWeather(weather);
+            mPresenter.checkUpdate(cityID, weather.getUpdate_date());
+
 
         } else {
-//            LogUtil.I(weatherList.get(0).getAirQuality().getAqi());
-
-            // TODO: 17-10-17  add vp to main Acty
-            for (Weather w : weatherList) {
-                intiView(w);
-            }
+            mPresenter.showWeatherInfo(null);
         }
+//        List<Weather> weatherList = App.getDaoSession().getWeatherDao().loadAll();
+//        if (weatherList == null || weatherList.size() == 0) {
+//
+//                mPresenter.showWeatherInfo(cityID);//设置当前城市
+//
+//        } else {
+////            LogUtil.I(weatherList.get(0).getAirQuality().getAqi());
+//
+//            for (Weather w : weatherList) {
+//                initWeather(w);
+//            }
+//        }
     }
 
-    private void intiView(Weather w) {
+
+    private void initWeather(Weather w) {
         updateView(w);
         List<HourlyWeather> hourlyWeathers = App.getDaoSession().getHourlyWeatherDao().queryBuilder()
                 .where(HourlyWeatherDao.Properties.City_id.eq(w.getCity_id()))
@@ -275,7 +283,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
             updateView(airQualityList.get(0));
         }
 
-        mPresenter.checkUpdate();
+//        mPresenter.checkUpdate();
     }
 
     private void updateView(AirQuality airQuality) {
@@ -371,15 +379,6 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     }
 
 
-    private void initCityDB() {
-        if (!(boolean) SharedPreferenceUtil.getSharedPreferences(this.getContext(), SP_LOCDB, false)) {
-            LogUtil.I("SP不存在 生成城市db");
-            mPresenter.makeLocDB();
-        } else {
-            LogUtil.I("SP存在 ");
-        }
-    }
-
     private void initView() {
         initRealtimeLayout();
 //        initRefreshLayout();
@@ -433,16 +432,17 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
                 if (scrollY > footerTop + headerDistance) {
                     header.setVisibility(View.VISIBLE);
                     header.setAlpha(1);
-                    Log.i("wxdtg", "onScrollChange: 显示" + header.getVisibility());
+//                    Log.i("wxdtg", "onScrollChange: 显示" + header.getVisibility());
+
                 } else if (scrollY > footerTop) {
                     header.setVisibility(View.VISIBLE);
                     float alpha = (scrollY - footerTop) / headerDistance;
                     header.setAlpha(alpha);
-                    Log.i("wxdtg", "onScrollChange: 渐变");
+//                    Log.i("wxdtg", "onScrollChange: 渐变");
 
                 } else {
                     header.setVisibility(View.INVISIBLE);
-                    Log.i("wxdtg", "onScrollChange: 不显示");
+//                    Log.i("wxdtg", "onScrollChange: 不显示");
 
                 }
             }
@@ -562,39 +562,39 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 //    }
 
 
-    private void showPoupWindow(View view) {
-
-        View popupView = WeatherFragment.this.getActivity().getLayoutInflater().inflate(R.layout.popup_menu, null);
-
-        TextView tv = (TextView) popupView.findViewById(R.id.add_city);
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new CommomDialog(mContext, dialog, "您确定删除此信息？", new CommomDialog.OnCloseListener() {
-
-                    @Override
-                    public void onClick(Dialog dialog, boolean confirm) {
-                        if (confirm) {
-                            UIUtils.showToast(dialog.getContext(), "confirm");
-                            dialog.dismiss();
-                        }
-                    }
-                })
-                        .setTitle("提示").show();
-            }
-        });
-
-        PopupWindow window = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        window.setAnimationStyle(R.style.popup_window_anim);
-        window.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F8F8F8")));
-        window.setFocusable(true);
-        window.setOutsideTouchable(true);
-
-        window.update();
-
-        window.showAsDropDown(view, 0, 20);
-    }
+//    private void showPoupWindow(View view) {
+//
+//        View popupView = WeatherFragment.this.getActivity().getLayoutInflater().inflate(R.layout.popup_menu, null);
+//
+//        TextView tv = (TextView) popupView.findViewById(R.id.add_city);
+//        tv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new CommomDialog(mContext, dialog, "您确定删除此信息？", new CommomDialog.OnCloseListener() {
+//
+//                    @Override
+//                    public void onClick(Dialog dialog, boolean confirm) {
+//                        if (confirm) {
+//                            UIUtils.showToast(dialog.getContext(), "confirm");
+//                            dialog.dismiss();
+//                        }
+//                    }
+//                })
+//                        .setTitle("提示").show();
+//            }
+//        });
+//
+//        PopupWindow window = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT, true);
+//        window.setAnimationStyle(R.style.popup_window_anim);
+//        window.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F8F8F8")));
+//        window.setFocusable(true);
+//        window.setOutsideTouchable(true);
+//
+//        window.update();
+//
+//        window.showAsDropDown(view, 0, 20);
+//    }
 
 
     public void initPresent() {
