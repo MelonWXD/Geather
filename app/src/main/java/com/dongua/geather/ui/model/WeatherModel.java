@@ -286,6 +286,8 @@ public class WeatherModel {
                 String code = futureJA.get(i).getAsJsonObject().get("code1").getAsString();
                 Future future = new Future(null, cityID, futuredate, day, high, low, text, code, wind);
 
+
+                //todo future
                 if(dataExist){
                     Long id = App.getDaoSession().getFutureDao().queryBuilder()
                             .where(FutureDao.Properties.City_id.eq(cityID)).list().get(0).getId();
