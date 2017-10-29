@@ -6,7 +6,6 @@ import android.support.v4.view.ViewPager;
 
 import com.dongua.geather.AppManager;
 import com.dongua.geather.R;
-import com.dongua.geather.bean.weather.Weather;
 import com.dongua.geather.ui.adapter.FragAdapter;
 import com.dongua.geather.ui.fragment.BaseFragment;
 import com.dongua.geather.ui.fragment.WeatherFragment;
@@ -33,8 +32,8 @@ public class MainActivity extends BaseActivity implements LocationView {
 
     ViewPager mViewPager;
     List<BaseFragment> windowFocusListenerList = new ArrayList<>();
-    List<Fragment> fragmentList = new ArrayList<>();
-    FragAdapter adapter;
+    List<Fragment> mFragmentList = new ArrayList<>();
+    FragAdapter mAdapter;
 
 
 
@@ -69,17 +68,17 @@ public class MainActivity extends BaseActivity implements LocationView {
         if (cityIDList == null) {
             WeatherFragment weatherFragment = new WeatherFragment();
             windowFocusListenerList.add(weatherFragment);
-            fragmentList.add(weatherFragment);
-            adapter = new FragAdapter(getSupportFragmentManager(), fragmentList);
+            mFragmentList.add(weatherFragment);
+            mAdapter = new FragAdapter(getSupportFragmentManager(), mFragmentList);
 
         }else {
             for (String cityID:cityIDList){
                 WeatherFragment weatherFragment = new WeatherFragment();
                 weatherFragment.setCityID(cityID);
                 windowFocusListenerList.add(weatherFragment);
-                fragmentList.add(weatherFragment);
+                mFragmentList.add(weatherFragment);
             }
-            adapter = new FragAdapter(getSupportFragmentManager(), fragmentList);
+            mAdapter = new FragAdapter(getSupportFragmentManager(), mFragmentList);
 
         }
 
@@ -88,10 +87,10 @@ public class MainActivity extends BaseActivity implements LocationView {
 //        windowFocusListenerList.add(weatherFragment2);
 //        weatherFragment2.setCityID("WX4FBXXFKE4F");
 
-//        fragmentList.add(weatherFragment2);
+//        mFragmentList.add(weatherFragment2);
 
         mViewPager = (ViewPager) findViewById(R.id.vp_main);
-        mViewPager.setAdapter(adapter);
+        mViewPager.setAdapter(mAdapter);
     }
 
     @Override

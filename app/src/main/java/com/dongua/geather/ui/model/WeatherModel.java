@@ -107,7 +107,6 @@ public class WeatherModel {
                     @Override
                     public void accept(ResponseBody responseBody) throws Exception {
                         Weather weather = parseResponse2Weather(responseBody, cityID, updateTime);
-
                         mListener.successed(weather);
 
                     }
@@ -273,8 +272,8 @@ public class WeatherModel {
             } else {
                 App.getDaoSession().getWeatherDao().save(weather);
                 int size = (int) SharedPreferenceUtil.getSharedPreferences(SP_CITY_SIZE, 0);
-                SharedPreferenceUtil.putSharedPreferences(SP_CITY_SIZE,size+1);
-                SharedPreferenceUtil.putSharedPreferences(SP_CITY_PREFIX+size,cityID);
+                SharedPreferenceUtil.putSharedPreferences(SP_CITY_SIZE, size + 1);
+                SharedPreferenceUtil.putSharedPreferences(SP_CITY_PREFIX + size, cityID);
             }
 
 
