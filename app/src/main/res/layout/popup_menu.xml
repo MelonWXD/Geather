@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/seagreen"
+    android:background="@color/mediumaquamarine"
     android:padding="5dp">
 
     <ImageView
@@ -16,21 +16,21 @@
         android:src="@mipmap/btn_toolbar_close"/>
 
     <TextView
-        android:id="@+id/tv_toolbar_menu1"
+        android:id="@+id/tv_toolbar_add"
         android:text="@string/tv_toolbar_menu1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/tv_toolbar_menu"/>
 
     <TextView
-        android:id="@+id/tv_toolbar_menu2"
+        android:id="@+id/tv_toolbar_share"
         android:text="@string/tv_toolbar_menu2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/tv_toolbar_menu"/>
 
     <TextView
-        android:id="@+id/tv_toolbar_menu3"
+        android:id="@+id/tv_toolbar_config"
         android:text="@string/tv_toolbar_menu3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
