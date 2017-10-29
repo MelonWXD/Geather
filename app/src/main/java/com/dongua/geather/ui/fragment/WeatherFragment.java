@@ -176,7 +176,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
                     break;
                 case MSG_HOURLY_WEATHER_DATA:
                     List<HourlyWeather> hourlyWeathers = (List<HourlyWeather>) msg.obj;
-                    updateView(hourlyWeathers, tempHigh, tempLow);
+                    updateView(hourlyWeathers);
                     break;
                 default:
                     break;
@@ -229,7 +229,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 
     private void initViewData() {
 
-        mPresenter.checkUpdate("WX4FBXXFKE4F", "a");
+//        mPresenter.checkUpdate("WX4FBXXFKE4F", "a");
 
         if (cityID != null) {
             Weather weather = App.getDaoSession().getWeatherDao().queryBuilder()
@@ -263,19 +263,8 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
         List<HourlyWeather> hourlyWeathers = App.getDaoSession().getHourlyWeatherDao().queryBuilder()
                 .where(HourlyWeatherDao.Properties.City_id.eq(w.getCity_id()))
                 .list();
-        int max = 0;
-        int min = 99;
-        for (HourlyWeather hourly : hourlyWeathers) {
-            int tmp = Integer.parseInt(hourly.getTemperature());
-            if (tmp > max) {
-                max = tmp;
-            }
-            if (min > tmp) {
-                min = tmp;
-            }
 
-        }
-        updateView(hourlyWeathers, max, min);
+        updateView(hourlyWeathers);
 
         List<AirQuality> airQualityList = App.getDaoSession().getAirQualityDao().queryBuilder()
                 .where(AirQualityDao.Properties.City_id.eq(w.getCity_id())).list();
@@ -292,11 +281,22 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     }
 
 
-    private void updateView(List<HourlyWeather> hourlyWeathers, int high, int low) {
+    private void updateView(List<HourlyWeather> hourlyWeathers) {
         LogUtil.I("updateView: hourly" + hourlyWeathers.size());
+        int max = 0;
+        int min = 99;
+        for (HourlyWeather hourly : hourlyWeathers) {
+            int tmp = Integer.parseInt(hourly.getTemperature());
+            if (tmp > max) {
+                max = tmp;
+            }
+            if (min > tmp) {
+                min = tmp;
+            }
 
+        }
 //        hourlyWeathers.forEach(hourlyWeather ->  LogUtil.I("hourly:"+hourlyWeather.toString()));
-        updateHourlyView(hourlyWeathers, high, low);
+        updateHourlyView(hourlyWeathers, max, min);
     }
 
     private void updateView(Weather weather) {
@@ -522,7 +522,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 //            hourlyWeatherList.add(bean);
 //        }
 
-
+        LogUtil.I("hourlyForecastView Init: high="+high+",low="+low);
         hourlyForecastView.setHighestTemp(high);
         hourlyForecastView.setLowestTemp(low);
         hourlyForecastView.initData(hourlyWeatherList);
