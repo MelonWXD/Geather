@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -172,11 +171,12 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
             switch (msg.what) {
                 case MSG_WEATHER_DATA:
                     Weather weather = (Weather) msg.obj;
-                    updateView(weather);
+                    updateWeahterView(weather);
+                    updateAirQualityView(weather);
                     break;
                 case MSG_HOURLY_WEATHER_DATA:
                     List<HourlyWeather> hourlyWeathers = (List<HourlyWeather>) msg.obj;
-                    updateView(hourlyWeathers);
+                    updateHourlyWeatherView(hourlyWeathers);
                     break;
                 default:
                     break;
@@ -259,30 +259,37 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 
 
     private void initWeather(Weather w) {
-        updateView(w);
+        updateWeahterView(w);
         List<HourlyWeather> hourlyWeathers = App.getDaoSession().getHourlyWeatherDao().queryBuilder()
                 .where(HourlyWeatherDao.Properties.City_id.eq(w.getCity_id()))
                 .list();
 
-        updateView(hourlyWeathers);
+        updateHourlyWeatherView(hourlyWeathers);
 
-        List<AirQuality> airQualityList = App.getDaoSession().getAirQualityDao().queryBuilder()
-                .where(AirQualityDao.Properties.City_id.eq(w.getCity_id())).list();
-        if (!airQualityList.isEmpty()) {
-            updateView(airQualityList.get(0));
-        }
+        updateAirQualityView(w);
+//        List<AirQuality> airQualityList = App.getDaoSession().getAirQualityDao().queryBuilder()
+//                .where(AirQualityDao.Properties.City_id.eq(w.getCity_id())).list();
+//        if (!airQualityList.isEmpty()) {
+//            updateAirQualityView(airQualityList.get(0));
+//        }
 
 //        mPresenter.checkUpdate();
     }
 
-    private void updateView(AirQuality airQuality) {
-        LogUtil.I(airQuality.toString());
-        updateRatioBar(airQuality);
+    private void updateAirQualityView(Weather w) {
+
+        List<AirQuality> airQualityList = App.getDaoSession().getAirQualityDao().queryBuilder()
+                .where(AirQualityDao.Properties.City_id.eq(w.getCity_id())).list();
+        if (!airQualityList.isEmpty()) {
+            AirQuality airQuality = airQualityList.get(0);
+            updateRatioBar(airQuality);
+            LogUtil.I(airQuality.toString());
+        }
     }
 
 
-    private void updateView(List<HourlyWeather> hourlyWeathers) {
-        LogUtil.I("updateView: hourly" + hourlyWeathers.size());
+    private void updateHourlyWeatherView(List<HourlyWeather> hourlyWeathers) {
+        LogUtil.I("updateHourlyWeatherView: hourly" + hourlyWeathers.size());
         int max = 0;
         int min = 99;
         for (HourlyWeather hourly : hourlyWeathers) {
@@ -299,9 +306,9 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
         updateHourlyView(hourlyWeathers, max, min);
     }
 
-    private void updateView(Weather weather) {
+    private void updateWeahterView(Weather weather) {
 
-        LogUtil.I("updateView:" + weather.toString());
+        LogUtil.I("updateHourlyWeatherView:" + weather.toString());
 
 
         String tempture = String.format(getResources().getString(R.string.cur_tempture), weather.getTemperature());
@@ -383,7 +390,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
         initRealtimeLayout();
 //        initRefreshLayout();
         initScrollView();
-        initHourlyView(data);
+        initHourlyView();
         initRatioBar();
 
 
@@ -485,7 +492,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     }
 
 
-    private void initHourlyView(String data) {
+    private void initHourlyView() {
 
         watched.addWatcher(hourlyForecastView);
 
@@ -506,7 +513,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 //            HourlyWeather bean = gson.fromJson(element, HourlyWeather.class);
 //            hourlyWeatherList.add(bean);
 //        }
-//        updateView(hourlyWeatherList, 16, 27);
+//        updateHourlyWeatherView(hourlyWeatherList, 16, 27);
     }
 
     private void updateHourlyView(List<HourlyWeather> hourlyWeatherList, int high, int low) {
@@ -522,7 +529,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 //            hourlyWeatherList.add(bean);
 //        }
 
-        LogUtil.I("hourlyForecastView Init: high="+high+",low="+low);
+        LogUtil.I("hourlyForecastView Init: high=" + high + ",low=" + low);
         hourlyForecastView.setHighestTemp(high);
         hourlyForecastView.setLowestTemp(low);
         hourlyForecastView.initData(hourlyWeatherList);
@@ -617,29 +624,4 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     }
 
 
-    String data = " {\"hourly\":[" +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"17\",\"time\":\"02:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"17\",\"time\":\"03:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"17\",\"time\":\"04:00\"}," +
-            "{\"text\":\"多云\",\"code\":\"4\",\"temperature\":\"16\",\"time\":\"05:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"17\",\"time\":\"06:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"18\",\"time\":\"07:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"19\",\"time\":\"08:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"20\",\"time\":\"09:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"22\",\"time\":\"10:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"24\",\"time\":\"11:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"25\",\"time\":\"12:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"26\",\"time\":\"13:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"27\",\"time\":\"14:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"0\",\"temperature\":\"26\",\"time\":\"15:00\"}," +
-            "{\"text\":\"多云\",\"code\":\"4\",\"temperature\":\"26\",\"time\":\"16:00\"}," +
-            "{\"text\":\"多云\",\"code\":\"4\",\"temperature\":\"25\",\"time\":\"17:00\"}," +
-            "{\"text\":\"多云\",\"code\":\"4\",\"temperature\":\"24\",\"time\":\"18:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"23\",\"time\":\"19:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"21\",\"time\":\"20:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"21\",\"time\":\"21:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"21\",\"time\":\"22:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"21\",\"time\":\"23:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"21\",\"time\":\"00:00\"}," +
-            "{\"text\":\"晴\",\"code\":\"1\",\"temperature\":\"20\",\"time\":\"01:00\"}]}";
 }

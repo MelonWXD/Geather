@@ -116,7 +116,7 @@ public class MainActivity extends BaseActivity implements LocationView {
     private List<String> getSharedCityID() {
         List<String> cityIDList = null;
         //如果有保存城市
-        int size = (int) SharedPreferenceUtil.getSharedPreferences(SP_CITY_SIZE, -1);
+        int size = (int) SharedPreferenceUtil.getSharedPreferences(SP_CITY_SIZE, 0);
         if (size > 0) {
             cityIDList = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {

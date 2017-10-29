@@ -16,6 +16,7 @@ import com.dongua.geather.db.WeatherDao;
 import com.dongua.geather.net.NetApi;
 import com.dongua.geather.ui.listener.OnNetworkListener;
 import com.dongua.geather.utils.LogUtil;
+import com.dongua.geather.utils.SharedPreferenceUtil;
 import com.dongua.geather.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -44,6 +45,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.dongua.geather.utils.Constant.SP_CITY_PREFIX;
+import static com.dongua.geather.utils.Constant.SP_CITY_SIZE;
 import static com.dongua.geather.utils.Utils.logger;
 
 /**
@@ -269,6 +272,9 @@ public class WeatherModel {
                 App.getDaoSession().getWeatherDao().update(weather);
             } else {
                 App.getDaoSession().getWeatherDao().save(weather);
+                int size = (int) SharedPreferenceUtil.getSharedPreferences(SP_CITY_SIZE, 0);
+                SharedPreferenceUtil.putSharedPreferences(SP_CITY_SIZE,size+1);
+                SharedPreferenceUtil.putSharedPreferences(SP_CITY_PREFIX+size,cityID);
             }
 
 
