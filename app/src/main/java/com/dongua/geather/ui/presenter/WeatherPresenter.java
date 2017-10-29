@@ -31,7 +31,7 @@ public class WeatherPresenter implements BasePresenter<WeatherView>, OnNetworkLi
 
     public void showWeatherInfo(String cityID) {
         if (cityID == null) {
-            mWeatherModel.getWeatherByIp();
+            mWeatherModel.getWeatherByIP();
 //        mWeatherModel.getWeatherJson(ipOrName);
         } else {
             mWeatherModel.getCityWeatherByID(cityID,null);

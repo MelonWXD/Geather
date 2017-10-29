@@ -31,7 +31,7 @@ import static com.dongua.geather.R.style.dialog;
 public abstract class BaseFragment extends Fragment implements IWindowFocusChangedListener, View.OnClickListener {
 
     private LinearLayout mRootLayout;
-
+    PopupWindow mPopupWindow;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,6 +47,18 @@ public abstract class BaseFragment extends Fragment implements IWindowFocusChang
             case R.id.iv_toolbar_right:
                 showPopUpWindow(v);
                 break;
+            case R.id.iv_toolbar_close:
+                mPopupWindow.dismiss();
+                break;
+            case R.id.tv_toolbar_add:
+//                showPopUpWindow(v);
+                break;
+            case R.id.tv_toolbar_share:
+//                showPopUpWindow(v);
+                break;
+            case R.id.tv_toolbar_config:
+//                showPopUpWindow(v);
+                break;
             default:
                 ;
         }
@@ -54,25 +66,21 @@ public abstract class BaseFragment extends Fragment implements IWindowFocusChang
 
     protected void showPopUpWindow(View view) {
         View popupView = this.getActivity().getLayoutInflater().inflate(R.layout.popup_menu, null);
-        Context c = this.getContext();
-        TextView tv = (TextView) popupView.findViewById(R.id.tv_toolbar_menu1);
-        tv.setOnClickListener(new View.OnClickListener() {
-                                  @Override
-                                  public void onClick(View v) {
-                                      LogUtil.I("click");
-                                  }
-                              }
-        );
 
-        PopupWindow window = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT,
+        popupView.findViewById(R.id.iv_toolbar_close).setOnClickListener(this);
+        popupView.findViewById(R.id.tv_toolbar_add).setOnClickListener(this);
+        popupView.findViewById(R.id.tv_toolbar_share).setOnClickListener(this);
+        popupView.findViewById(R.id.tv_toolbar_config).setOnClickListener(this);
+
+        mPopupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        window.setAnimationStyle(R.style.popup_window_anim);
-        window.setFocusable(true);
-        window.setOutsideTouchable(true);
+        mPopupWindow.setAnimationStyle(R.style.popup_window_anim);
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.setOutsideTouchable(true);
 
-        window.update();
+        mPopupWindow.update();
 
-        window.showAtLocation(mRootLayout, Gravity.TOP,0, 0);
+        mPopupWindow.showAtLocation(mRootLayout, Gravity.TOP,0, 0);
     }
 
     public View setContentWithToolBar(View view) {
