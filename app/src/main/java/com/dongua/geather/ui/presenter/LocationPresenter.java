@@ -12,7 +12,7 @@ import static com.dongua.geather.utils.Constant.SP_LOCDB;
  * Created by duoyi on 17-10-21.
  */
 
-public class LocationPresenter implements BasePresenter {
+public class LocationPresenter implements BasePresenter<LocationView> {
 
     LocationModel mLocModel;
     LocationView mLocView;
@@ -25,7 +25,7 @@ public class LocationPresenter implements BasePresenter {
     }
 
     @Override
-    public Object getView() {
+    public LocationView getView() {
         return mLocView;
     }
 
