@@ -40,8 +40,8 @@ public class NetApi {
 
     public static NetApi getInstance() {
         if (mNetClient == null) {
-            if (mNetClient == null) {
-                synchronized (NetApi.class) {
+            synchronized (NetApi.class) {
+                if (mNetClient == null) {
                     mNetClient = new NetApi();
                 }
             }
